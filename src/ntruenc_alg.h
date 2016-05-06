@@ -99,12 +99,12 @@ int NTRUENC_MOD_INV_Q(short *fq, short *f)
 
 /**
  * Generate public and private key values.
- *   f' = random vector * p mod q
+ *   f' = (random vector * p) mod q
  *   f  = 1 + p.f' mod q
  *   t  = f^-1 mod q
- *   g  = random vector mod q * p
+ *   g  = (random vector mod q) * p
  *   h  = g.t
- *   
+ *
  * @param [in] f  The random private value f.
  * @param [in] h  The public value h.
  * @param [in] t  The temprorary buffer to use in generation.
