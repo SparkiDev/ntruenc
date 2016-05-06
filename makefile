@@ -29,8 +29,6 @@ LIBS=
 
 all: ntruenc_test
 
-#ASM=src/asm/ntruenc_s112_x64.s src/asm/ntruenc_s128_x64.s src/asm/ntruenc_s192_x64.s src/asm/ntruenc_s256_x64.s
-#ASM_OBJ=ntruenc_s112_x64.o ntruenc_s128_x64.o ntruenc_s192_x64.o ntruenc_s256_x64.o
 NTRUENC_MUL_Q=ntruenc_s112_mul_q.o ntruenc_s128_mul_q.o ntruenc_s192_mul_q.o ntruenc_s256_mul_q.o
 NTRUENC_IMPL=ntruenc_s112.o ntruenc_s128.o ntruenc_s192.o ntruenc_s256.o $(NTRUENC_MUL_Q)
 
@@ -57,28 +55,6 @@ ntruenc_s192_mul_q.o: src/mul/ntruenc_s192_mul_q.c src/*.h include/*.h
 	$(CC) -c $(CFLAGS) -Isrc -o $@ $<
 ntruenc_s256_mul_q.o: src/mul/ntruenc_s256_mul_q.c src/*.h include/*.h
 	$(CC) -c $(CFLAGS) -Isrc -o $@ $<
-
-#src/asm/ntruenc_s112_x64.s: src/asm/ntruenc_asm.rb rubyasm/x86_asm.rb
-#	ruby src/asm/ntruenc_asm.rb 112 > $@
-#ntruenc_s112_x64.o: src/asm/ntruenc_s112_x64.s
-#	$(CC) -c -o $@ $<
-#
-#src/asm/ntruenc_s128_x64.s: src/asm/ntruenc_asm.rb rubyasm/x86_asm.rb
-#	ruby src/asm/ntruenc_asm.rb 128 > $@
-#ntruenc_s128_x64.o: src/asm/ntruenc_s128_x64.s
-#	$(CC) -c -o $@ $<
-#
-#src/asm/ntruenc_s192_x64.s: src/asm/ntruenc_asm.rb rubyasm/x86_asm.rb
-#	ruby src/asm/ntruenc_asm.rb 192 > $@
-#ntruenc_s192_x64.o: src/asm/ntruenc_s192_x64.s
-#	$(CC) -c -o $@ $<
-#
-#src/asm/ntruenc_s256_x64.s: src/asm/ntruenc_asm.rb rubyasm/x86_asm.rb
-#	ruby src/asm/ntruenc_asm.rb 256 > $@
-#ntruenc_s256_x64.o: src/asm/ntruenc_s256_x64.s
-#	$(CC) -c -o $@ $<
-#
-#asm: $(ASM)
 
 ntruenc_test.o: test/ntruenc_test.c
 	$(CC) -c $(CFLAGS) -Isrc -o $@ $<

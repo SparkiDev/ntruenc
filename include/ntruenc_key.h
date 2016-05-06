@@ -24,8 +24,6 @@
 #ifndef NTRUENC_KEY_H
 #define NTRUENC_KEY_H
 
-#define NTRUENC_METHS_FLAG_ASM	1
-
 /** Private key data type.  */
 typedef struct ntruenc_priv_key_st NTRUENC_PRIV_KEY;
 /** Public key data type.  */

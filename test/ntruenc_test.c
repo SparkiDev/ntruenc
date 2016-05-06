@@ -316,7 +316,6 @@ end:
 /*
  * Main entry point of program.<br>
  *  -speed   Test the speed of operations in cycles and per second.<br>
- *  -no_asm     Test the speed in cycles and operations per second.<br>
  *  <strength>  The algorithm strength to test.
  *
  * @param [in] argc  The count of command line arguments.
@@ -331,7 +330,7 @@ int main(int argc, char *argv[])
     int s;
     int which = 0;
     int speed = 0;
-    int flags = NTRUENC_METHS_FLAG_ASM;
+    int flags = 0;
 
     while (--argc)
     {
@@ -339,8 +338,6 @@ int main(int argc, char *argv[])
 
         if (strcmp(*argv, "-speed") == 0)
             speed = 1;
-        else if (strcmp(*argv, "-no_asm") == 0)
-            flags &= ~NTRUENC_METHS_FLAG_ASM;
         else
         {
             s = atoi(*argv);
