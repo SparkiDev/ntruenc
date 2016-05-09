@@ -20,6 +20,53 @@
  * SOFTWARE.
  */
 
+#include "ntruenc.h"
+#include "ntruenc_key.h"
+
+/**
+ * The method table for NTRU Encryption operations.
+ */
+typedef struct ntruenc_meths_st
+{
+    /** The maximum security strength supported by implementation. */
+    int strength;
+    /** Flags describing implementation. */
+    int flags;
+    /** Number of NTRU vectors required for encryption by implementation. */
+    char enc_num;
+    /** Number of NTRU vectors required for decryption by implementation. */
+    char dec_num;
+    /** Number of NTRU vectors required for key generation by implementation. */
+    char keygen_num;
+    /** Function to perform encryption. */
+    int (*enc)(short *e, short *m, short *h, short *t);
+    /** Function to perform decryption. */
+    void (*dec)(short *c, short *e, short *f, short *t);
+    /** Function to perform key generation. */
+    int (*keygen)(short *f, short *h, short *t);
+} NTRUENC_METHS;
+
+
+struct ntruenc_st
+{
+    /** Implementation of NTRU Encryption. */
+    NTRUENC_METHS *meths;
+    /** The private key to use with the operation. */
+    NTRUENC_PRIV_KEY *priv;
+    /** The public key to use with the operation. */
+    NTRUENC_PUB_KEY *pub;
+    /** The parameters to use with the operation. */
+    NTRUENC_PARAMS *params;
+    /** Message as an NTRU vector. */
+    short *m;
+    /** Encrypted data as NTRU vectors. */
+    short *enc;
+    /** Temprorary dynamicly allocated data. */
+    short *t;
+};
+
+int ntruenc_meths_get(short strength, int flags, NTRUENC_METHS **meths);
+
 /* Common parameter */
 #define NTRU_P		3
 
@@ -147,16 +194,4 @@ void ntruenc_s256_decrypt(short *c, short *e, short *f, short *t);
 int ntruenc_s256_mod_inv_2(short *r, short *a);
 int ntruenc_s256_mod_inv_q(short *r, short *a);
 void ntruenc_s256_mul_mod_q(short *r, short *a, short *b);
-
-
-/* Error codes */
-/**
- * The random number generator failed to generate the required bytes.
- */
-#define NTRU_ERR_RANDOM		2
-/**
- * The operation failed to find an inverse value.
- */
-#define NTRU_ERR_NO_INVERSE	3
-
 

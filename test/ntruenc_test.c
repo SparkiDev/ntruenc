@@ -52,37 +52,40 @@ void calc_cps()
  * Determine the number of encryption operations that can be performed per
  * second.
  *
- * @param [in] data     The vectorized message or key.
+ * @param [in] ne       The NTRU Encryption operation object.
+ * @param [in] data     The message or key data.
+ * @param [in] len      The length of the message or key data.
  * @param [in] pub_key  The public key.
  */
-void enc_cycles(short *data, NTRUENC_PUB_KEY *pub_key)
+void enc_cycles(NTRUENC *ne, unsigned char *data, int len,
+    NTRUENC_PUB_KEY *pub_key)
 {
     int i;
     uint64_t start, end, diff;
     int num_ops;
-    short *enc;
-    int len;
+    unsigned char *enc;
+    int elen;
 
-    NTRUENC_PUB_KEY_get_enc_len(pub_key, &len);
-    enc = malloc(len);
+    NTRUENC_PUB_KEY_get_enc_len(pub_key, &elen);
+    enc = malloc(elen);
 
-    NTRUENC_encrypt_init(pub_key);
+    NTRUENC_encrypt_init(ne, pub_key);
 
     /* Prime the caches, etc */
     for (i=0; i<200; i++)
-        NTRUENC_encrypt(enc, data, pub_key);
+        NTRUENC_encrypt(ne, data, len, enc, elen);
 
     /* Approximate number of ops in a second. */
     start = get_cycles();
     for (i=0; i<100; i++)
-        NTRUENC_encrypt(enc, data, pub_key);
+        NTRUENC_encrypt(ne, data, len, enc, elen);
     end = get_cycles();
     num_ops = cps/((end-start)/100);
 
     /* Perform about 1 seconds worth of operations. */
     start = get_cycles();
     for (i=0; i<num_ops; i++)
-        NTRUENC_encrypt(enc, data, pub_key);
+        NTRUENC_encrypt(ne, data, len, enc, elen);
     end = get_cycles();
 
     diff = end - start;
@@ -90,7 +93,7 @@ void enc_cycles(short *data, NTRUENC_PUB_KEY *pub_key)
     printf("enc: %7d %2.3f  %7"PRIu64" %6"PRIu64"\n", num_ops, diff/(cps*1.0),
         diff/num_ops, cps/(diff/num_ops));
 
-    NTRUENC_encrypt_final(pub_key);
+    NTRUENC_encrypt_final(ne);
 
     free(enc);
 }
@@ -99,37 +102,43 @@ void enc_cycles(short *data, NTRUENC_PUB_KEY *pub_key)
  * Determine the number of decryption operations that can be performed per
  * second.
  *
+ * @param [in] ne        The NTRU Encryption operation object.
  * @param [in] enc       Encrypted data.
+ * @param [in] elen      The length of the encrypted data.
  * @param [in] priv_key  The private key.
  */
-void dec_cycles(short *enc, NTRUENC_PRIV_KEY *priv_key)
+void dec_cycles(NTRUENC *ne, unsigned char *enc, int elen,
+    NTRUENC_PRIV_KEY *priv_key)
 {
     int i;
     uint64_t start, end, diff;
     int num_ops;
-    short *dec;
+    unsigned char *dec;
+    int len;
+    int olen;
     int n;
 
-    NTRUENC_PRIV_KEY_get_len(priv_key, &n);
-    dec = malloc(n * sizeof(enc));
+    NTRUENC_PRIV_KEY_num_entries(priv_key, &n);
+    len = (n + 7) / 8;
+    dec = malloc(len);
 
-    NTRUENC_decrypt_init(priv_key);
+    NTRUENC_decrypt_init(ne, priv_key);
 
     /* Prime the caches, etc */
     for (i=0; i<200; i++)
-        NTRUENC_decrypt(dec, enc, priv_key);
+        NTRUENC_decrypt(ne, enc, elen, dec, len, &olen);
 
     /* Approximate number of ops in a second. */
     start = get_cycles();
     for (i=0; i<100; i++)
-        NTRUENC_decrypt(dec, enc, priv_key);
+        NTRUENC_decrypt(ne, enc, elen, dec, len, &olen);
     end = get_cycles();
     num_ops = cps/((end-start)/100);
 
     /* Perform about 1 seconds worth of operations. */
     start = get_cycles();
     for (i=0; i<num_ops; i++)
-        NTRUENC_decrypt(dec, enc, priv_key);
+        NTRUENC_decrypt(ne, enc, elen, dec, len, &olen);
     end = get_cycles();
 
     diff = end - start;
@@ -137,7 +146,7 @@ void dec_cycles(short *enc, NTRUENC_PRIV_KEY *priv_key)
     printf("dec: %7d %2.3f  %7"PRIu64" %6"PRIu64"\n", num_ops, diff/(cps*1.0),
         diff/num_ops, cps/(diff/num_ops));
 
-    NTRUENC_decrypt_final(priv_key);
+    NTRUENC_decrypt_final(ne);
 
     free(dec);
 }
@@ -149,28 +158,29 @@ void dec_cycles(short *enc, NTRUENC_PRIV_KEY *priv_key)
  * @param [in] priv_key  The public key.
  * @param [in] pub_key   The public key.
  */
-void keygen_cycles(NTRUENC_PRIV_KEY *priv_key, NTRUENC_PUB_KEY *pub_key)
+void keygen_cycles(NTRUENC *ne, NTRUENC_PARAMS *params,
+    NTRUENC_PRIV_KEY *priv_key, NTRUENC_PUB_KEY *pub_key)
 {
     int i;
     uint64_t start, end, diff;
     int num_ops;
 
-    NTRUENC_keygen_init(priv_key, pub_key);
+    NTRUENC_keygen_init(ne, params);
     /* Prime the caches, etc */
     for (i=0; i<100; i++)
-        NTRUENC_keygen(priv_key, pub_key);
+        NTRUENC_keygen(ne, &priv_key, &pub_key);
 
     /* Approximate number of ops in a second. */
     start = get_cycles();
     for (i=0; i<100; i++)
-        NTRUENC_keygen(priv_key, pub_key);
+        NTRUENC_keygen(ne, &priv_key, &pub_key);
     end = get_cycles();
     num_ops = cps/((end-start)/100);
 
     /* Perform about 1 seconds worth of operations. */
     start = get_cycles();
     for (i=0; i<num_ops; i++)
-        NTRUENC_keygen(priv_key, pub_key);
+        NTRUENC_keygen(ne, &priv_key, &pub_key);
     end = get_cycles();
 
     diff = end - start;
@@ -178,31 +188,18 @@ void keygen_cycles(NTRUENC_PRIV_KEY *priv_key, NTRUENC_PUB_KEY *pub_key)
     printf("kgn: %7d %2.3f  %7"PRIu64" %6"PRIu64"\n", num_ops, diff/(cps*1.0),
         diff/num_ops, cps/(diff/num_ops));
 
-    NTRUENC_keygen_final(priv_key, pub_key);
+    NTRUENC_keygen_final(ne);
 }
 
 /*
  * Generate a random vector as the hash.
  *
- * @param [in] hash      The NTRU vector to fill.
- * @param [in] n         The number of elements in the vector.
- * @param [in] strength  The strength of the hash.
+ * @param [in] msg       The message buffer.
+ * @param [in] len       The length of the buffer.
  */
-int random_data(short *hash, int n, int strength)
+int random_data(unsigned char *msg, int len)
 {
-    int ret;
-    int i;
-
-    memset(hash, 0, n*sizeof(*hash));
-    ret = pseudo_random((unsigned char *)hash, strength*4);
-    if (ret != 0)
-        goto end;
-
-    for (i=0; i<strength*2; i++)
-        hash[i] = ((hash[i] & 1) << 1) - 1;
-
-end:
-    return ret;
+    return pseudo_random(msg, len);
 }
 
 /*
@@ -217,98 +214,147 @@ end:
 int test_ntruenc(int strength, int flags, int speed)
 {
     int ret;
+    NTRUENC_PARAMS *params = NULL;
     NTRUENC_PRIV_KEY *priv_key = NULL;
     NTRUENC_PUB_KEY *pub_key = NULL;
-    short *data = NULL;
-    short *dec = NULL;
-    short *enc = NULL;
-    int n;
+    NTRUENC_PRIV_KEY *priv_key_gen = NULL;
+    NTRUENC_PUB_KEY *pub_key_gen = NULL;
+    NTRUENC *ne = NULL;
+    unsigned char *data = NULL;
     int len;
+    unsigned char *dec = NULL;
+    int olen;
+    unsigned char *enc = NULL;
+    int elen;
+    int n;
+    unsigned char *priv = NULL;
+    unsigned char *pub = NULL;
+    int priv_len, pub_len;
     int i;
 
     printf("Strength: %d\n", strength);
 
+    ret = NTRUENC_PARAMS_get(strength, &params);
+    if (ret != 0)
+        goto end;
     /* Create empty private and public keys. */
-    ret = NTRUENC_PRIV_KEY_new(strength, flags, &priv_key);
+    ret = NTRUENC_PRIV_KEY_new(params, &priv_key);
     if (ret != 0)
         goto end;
-    ret = NTRUENC_PUB_KEY_new(strength, flags, &pub_key);
+    ret = NTRUENC_PUB_KEY_new(params, &pub_key);
+    if (ret != 0)
+        goto end;
+    ret = NTRUENC_PRIV_KEY_new(params, &priv_key_gen);
+    if (ret != 0)
+        goto end;
+    ret = NTRUENC_PUB_KEY_new(params, &pub_key_gen);
     if (ret != 0)
         goto end;
 
-    NTRUENC_PUB_KEY_get_len(pub_key, &n);
-    NTRUENC_PUB_KEY_get_enc_len(pub_key, &len);
-    printf("Vector Length: %d elements, Encrypted Length: %d bytes\n", n, len);
+    NTRUENC_PUB_KEY_num_entries(pub_key, &n);
+    NTRUENC_PUB_KEY_get_enc_len(pub_key, &elen);
+    NTRUENC_PRIV_KEY_get_len(priv_key, &priv_len);
+    NTRUENC_PUB_KEY_get_len(pub_key, &pub_len);
+    printf("Vector Length: %d elements, Encrypted Length: %d bytes\n", n, elen);
+    printf("Private Key Length: %d bytes, Public Key Length: %d bytes\n",
+        priv_len, pub_len);
 
+    len = strength / 4;
     /* Allocate memory for hash and signature. */
     data = malloc(n*sizeof(short));
-    enc = malloc(len);
+    enc = malloc(elen);
     dec = malloc(len);
-    if ((data == NULL) || (enc == NULL) || (dec == NULL))
+    priv = malloc(priv_len);
+    pub = malloc(pub_len);
+    if ((data == NULL) || (enc == NULL) || (dec == NULL) || (priv == NULL) ||
+        (pub == NULL))
         goto end;
 
     /* Create vectorized data. */
-    ret = random_data(data, n, strength);
+    ret = random_data(data, len);
     fprintf(stderr, "Data: %d", ret);
     if (ret != 0)
         goto end;
 
+    ret = NTRUENC_new(strength, flags, &ne);
+    if (ret != 0)
+        goto end;
+
     /* Generate private and public keys. */
-    ret = NTRUENC_keygen_init(priv_key, pub_key);
+    ret = NTRUENC_keygen_init(ne, params);
     fprintf(stderr, ", kg init: %d", ret);
     if (ret != 0)
         goto end;
-    ret = NTRUENC_keygen(priv_key, pub_key);
+    ret = NTRUENC_keygen(ne, &priv_key_gen, &pub_key_gen);
     fprintf(stderr, ", kg: %d", ret);
-    NTRUENC_keygen_final(priv_key, pub_key);
+    NTRUENC_keygen_final(ne);
     if (ret != 0)
         goto end;
 
-    ret = NTRUENC_encrypt_init(pub_key);
+    ret = NTRUENC_PRIV_KEY_encode(priv_key_gen, priv, priv_len);
+    if (ret != 0)
+        goto end;
+    ret = NTRUENC_PRIV_KEY_decode(priv_key, priv, priv_len);
+    if (ret != 0)
+        goto end;
+
+    ret = NTRUENC_PUB_KEY_encode(pub_key_gen, pub, pub_len);
+    if (ret != 0)
+        goto end;
+    ret = NTRUENC_PUB_KEY_decode(pub_key, pub, pub_len);
+    if (ret != 0)
+        goto end;
+
+    ret = NTRUENC_encrypt_init(ne, pub_key);
     fprintf(stderr, ", enc init: %d", ret);
     if (ret != 0)
         goto end;
-    ret = NTRUENC_encrypt(enc, data, pub_key);
+    ret = NTRUENC_encrypt(ne, data, len, enc, elen);
     fprintf(stderr, ", enc: %d", ret);
-    NTRUENC_encrypt_final(pub_key);
+    NTRUENC_encrypt_final(ne);
     if (ret != 0)
         goto end;
 
-    ret = NTRUENC_decrypt_init(priv_key);
+    ret = NTRUENC_decrypt_init(ne, priv_key);
     fprintf(stderr, ", dec init: %d", ret);
     if (ret != 0)
         goto end;
-    NTRUENC_decrypt(dec, enc, priv_key);
-    fprintf(stderr, ", decrypt: ");
-    NTRUENC_decrypt_final(priv_key);
-    for (i=0; i<n; i++)
+    ret = NTRUENC_decrypt(ne, enc, elen, dec, len, &olen);
+    fprintf(stderr, ", decrypt: %d", ret);
+    NTRUENC_decrypt_final(ne);
+    for (i=0; i<olen; i++)
     {
         if (dec[i] != data[i])
         {
-            printf("Diff (%d, %d/%d)", i, dec[i], data[i]);
+            printf(",Diff (%d, %d/%d)", i, dec[i], data[i]);
             ret = 1;
             goto end;
         }
     }
-    fprintf(stderr, "equal");
+    fprintf(stderr, ",%d", olen);
 
     if (speed)
     {
         printf("\n");
         printf(" Op  %7s %5s  %7s %6s\n", "ops", "secs", "c/op", "ops/s");
-        enc_cycles(data, pub_key);
-        dec_cycles(enc, priv_key);
-        keygen_cycles(priv_key, pub_key);
+        enc_cycles(ne, data, len, pub_key);
+        dec_cycles(ne, enc, elen, priv_key);
+        keygen_cycles(ne, params, priv_key, pub_key);
     }
 
 end:
     printf("\n");
     /* Cleanup dynamic memory. */
+    if (pub != NULL) free(pub);
+    if (priv != NULL) free(priv);
     if (dec != NULL) free(dec);
     if (enc != NULL) free(enc);
     if (data != NULL) free(data);
+    NTRUENC_free(ne);
     NTRUENC_PUB_KEY_free(pub_key);
     NTRUENC_PRIV_KEY_free(priv_key);
+    NTRUENC_PUB_KEY_free(pub_key_gen);
+    NTRUENC_PRIV_KEY_free(priv_key_gen);
 
     return ret;
 }

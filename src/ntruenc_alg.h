@@ -22,8 +22,6 @@
 
 #include <string.h>
 
-#include "ntruenc_lcl.h"
-
 /**
  * The data needed to convert a number mod 3 to a number in the range: -1..1.
  */
@@ -175,6 +173,7 @@ void NTRUENC_DECRYPT(short *c, short *e, short *f, short *t)
     int i;
 
     NTRUENC_MUL_MOD_Q(c, f, e);
+    /* Calculate mod p to isolate the message/key. */
     for (i=0; i<NTRU_N; i++)
         c[i] = ntruenc_neg_mod_3(c[i]);
 }

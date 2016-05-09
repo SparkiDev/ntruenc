@@ -25,22 +25,34 @@
 #define NTRUENC_KEY_H
 
 /** Private key data type.  */
+typedef struct ntruenc_params_st NTRUENC_PARAMS;
+/** Private key data type.  */
 typedef struct ntruenc_priv_key_st NTRUENC_PRIV_KEY;
 /** Public key data type.  */
 typedef struct ntruenc_pub_key_st NTRUENC_PUB_KEY;
 
-int NTRUENC_PRIV_KEY_new(short strength, int flags, NTRUENC_PRIV_KEY **key);
-int NTRUENC_PRIV_KEY_init(NTRUENC_PRIV_KEY *key, short strength, int flags);
+int NTRUENC_PARAMS_get(short strength, NTRUENC_PARAMS **params);
+
+int NTRUENC_PRIV_KEY_new(NTRUENC_PARAMS *params, NTRUENC_PRIV_KEY **key);
+int NTRUENC_PRIV_KEY_init(NTRUENC_PRIV_KEY *key, NTRUENC_PARAMS *params);
 void NTRUENC_PRIV_KEY_final(NTRUENC_PRIV_KEY *key);
 void NTRUENC_PRIV_KEY_free(NTRUENC_PRIV_KEY *key);
+int NTRUENC_PRIV_KEY_num_entries(NTRUENC_PRIV_KEY *key, int *n);
 int NTRUENC_PRIV_KEY_get_len(NTRUENC_PRIV_KEY *key, int *len);
+int NTRUENC_PRIV_KEY_encode(NTRUENC_PRIV_KEY *key, unsigned char *data,
+    int len);
+int NTRUENC_PRIV_KEY_decode(NTRUENC_PRIV_KEY *key, unsigned char *data,
+    int len);
 
-int NTRUENC_PUB_KEY_new(short strength, int flags, NTRUENC_PUB_KEY **key);
-int NTRUENC_PUB_KEY_init(NTRUENC_PUB_KEY *key, short strength, int flags);
+int NTRUENC_PUB_KEY_new(NTRUENC_PARAMS *params, NTRUENC_PUB_KEY **key);
+int NTRUENC_PUB_KEY_init(NTRUENC_PUB_KEY *key, NTRUENC_PARAMS *params);
 void NTRUENC_PUB_KEY_final(NTRUENC_PUB_KEY *key);
 void NTRUENC_PUB_KEY_free(NTRUENC_PUB_KEY *key);
-int NTRUENC_PUB_KEY_get_len(NTRUENC_PUB_KEY *key, int *len);
+int NTRUENC_PUB_KEY_num_entries(NTRUENC_PUB_KEY *key, int *n);
 int NTRUENC_PUB_KEY_get_enc_len(NTRUENC_PUB_KEY *key, int *len);
+int NTRUENC_PUB_KEY_get_len(NTRUENC_PUB_KEY *key, int *len);
+int NTRUENC_PUB_KEY_encode(NTRUENC_PUB_KEY *key, unsigned char *data, int len);
+int NTRUENC_PUB_KEY_decode(NTRUENC_PUB_KEY *key, unsigned char *data, int len);
 
 #endif
 

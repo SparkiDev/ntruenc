@@ -21,7 +21,6 @@
  */
 
 #include "string.h"
-#include "ntruenc_lcl.h"
 #include "random.h"
 
 #if 1

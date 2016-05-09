@@ -20,6 +20,7 @@
  * SOFTWARE.
  */
 
+#include "ntruenc_lcl.h"
 
 #define NTRU_N			NTRU_S192_N
 #define NTRU_DF			NTRU_S192_DF

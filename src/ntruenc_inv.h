@@ -21,7 +21,6 @@
  */
 
 #include <string.h>
-#include "ntruenc_lcl.h"
 
 /**
  * The data required for each pair of values.

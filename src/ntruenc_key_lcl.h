@@ -27,32 +27,9 @@
 #include "ntruenc_key.h"
 
 /**
- * The method table for NTRU Encryption operations.
- */
-typedef struct ntruenc_meths_st
-{
-    /** The maximum security strength supported by implementation. */
-    int strength;
-    /** Flags describing implementation. */
-    int flags;
-    /** Number of NTRU vectors required for encryption by implementation. */
-    char enc_num;
-    /** Number of NTRU vectors required for decryption by implementation. */
-    char dec_num;
-    /** Number of NTRU vectors required for key generation by implementation. */
-    char keygen_num;
-    /** Function to perform encryption. */
-    int (*enc)(short *e, short *m, short *h, short *t);
-    /** Function to perform decryption. */
-    void (*dec)(short *c, short *e, short *f, short *t);
-    /** Function to perform key generation. */
-    int (*keygen)(short *f, short *h, short *t);
-} NTRUENC_METHS;
-
-/**
  * The parameters structure for NTRU.
  */
-typedef struct ntruenc_params_st
+struct ntruenc_params_st
 {
     /** The maximum security strength supported by parameters. */
     short strength;
@@ -64,7 +41,7 @@ typedef struct ntruenc_params_st
     short dg;
     /** The larger modulus value. */
     short q;
-} NTRUENC_PARAMS;
+};
 
 /**
  * The private key structure.
@@ -73,24 +50,16 @@ struct ntruenc_priv_key_st
 {
     /** NTRU parameters. */
     NTRUENC_PARAMS *params;
-    /** Implementation of NTRU Encryption.  */
-    NTRUENC_METHS *meths;
     /* Private key value. */
     short *f;
-    /* Temprorary dynamicly allocated data. */
-    short *t;
 };
 
 struct ntruenc_pub_key_st
 {
     /** NTRU parameters. */
     NTRUENC_PARAMS *params;
-    /** Implementation of NTRU Encryption.  */
-    NTRUENC_METHS *meths;
     /* Public key value. */
     short *h;
-    /* Temprorary dynamicly allocated data. */
-    short *t;
 };
 
 #endif /* NTRUENC_KEY_LCL_H */
