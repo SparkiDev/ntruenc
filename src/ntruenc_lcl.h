@@ -74,25 +74,25 @@ int ntruenc_meths_get(short strength, int flags, NTRUENC_METHS **meths);
  * The number of -1 elements in a random NTRU vector mod p for a security
  * strength of 112-bits.
  */
-#define NTRU_S112_DF		101
+#define NTRU_S112_DF		142
 /**
  * The number of -1 elements in a random NTRU vector mod p for a security
  * strength of 112-bits in g.
  */
-#define NTRU_S112_DG		131
+#define NTRU_S112_DG		146
 /**
  * The number of elements in an NTRU vector for a security strength of 112-bits.
  */
-#define NTRU_S112_N		401
+#define NTRU_S112_N		439
 /**
  * The largest modulus value when using a security strength of 112-bits.
  */
-#define NTRU_S112_Q		2048
+#define NTRU_S112_Q		6833
 /**
  * The number of bits to the largest modulus value when using a security
  * strength of 112-bits.
  */
-#define NTRU_S112_Q_BITS	11
+#define NTRU_S112_Q_BITS	13
 int ntruenc_s112_random(short *a, int df1, int df2, short v);
 int ntruenc_s112_keygen(short *f, short *h, short *t);
 int ntruenc_s112_encrypt(short *e, short *m, short *h, short *t);
@@ -106,25 +106,25 @@ void ntruenc_s112_mul_mod_q(short *r, short *a, short *b);
  * The number of -1 elements in a random NTRU vector mod p for a security
  * strength of 128-bits.
  */
-#define NTRU_S128_DF		112
+#define NTRU_S128_DF		131
 /**
  * The number of -1 elements in a random NTRU vector mod p for a security
  * strength of 128-bits in g.
  */
-#define NTRU_S128_DG		146
+#define NTRU_S128_DG		163
 /**
  * The number of elements in an NTRU vector for a security strength of 128-bits.
  */
-#define NTRU_S128_N		439
+#define NTRU_S128_N		491
 /**
  * The largest modulus value when using a security strength of 128-bits.
  */
-#define NTRU_S128_Q		2048
+#define NTRU_S128_Q		6287
 /**
  * The number of bits to the largest modulus value when using a security
  * strength of 128-bits.
  */
-#define NTRU_S128_Q_BITS	11
+#define NTRU_S128_Q_BITS	13
 int ntruenc_s128_random(short *a, int df1, int df2, short v);
 int ntruenc_s128_keygen(short *f, short *h, short *t);
 int ntruenc_s128_encrypt(short *e, short *m, short *h, short *t);
@@ -137,20 +137,20 @@ void ntruenc_s128_mul_mod_q(short *r, short *a, short *b);
  * The number of -1 elements in a random NTRU vector mod p for a security
  * strength of 192.
  */
-#define NTRU_S192_DF		158
+#define NTRU_S192_DF		155
 /**
  * The number of -1 elements in a random NTRU vector mod p for a security
  * strength of 192 in g.
  */
-#define NTRU_S192_DG		197
+#define NTRU_S192_DG		219
 /**
  * The number of elements in an NTRU vector for a security strength of 192-bits.
  */
-#define NTRU_S192_N		593
+#define NTRU_S192_N		659
 /**
  * The largest modulus value when using a security strength of 192-bits.
  */
-#define NTRU_S192_Q		2048
+#define NTRU_S192_Q		7481
 /**
  * The number of bits to the largest modulus value when using a security
  * strength of 192-bits.
@@ -166,22 +166,53 @@ void ntruenc_s192_mul_mod_q(short *r, short *a, short *b);
 
 /**
  * The number of -1 elements in a random NTRU vector mod p for a security
+ * strength of 215.
+ */
+#define NTRU_S215_DF		204
+/**
+ * The number of -1 elements in a random NTRU vector mod p for a security
+ * strength of 215 in g.
+ */
+#define NTRU_S215_DG		246
+/**
+ * The number of elements in an NTRU vector for a security strength of 215-bits.
+ */
+#define NTRU_S215_N		739
+/**
+ * The largest modulus value when using a security strength of 215-bits.
+ */
+#define NTRU_S215_Q		9829
+/**
+ * The number of bits to the largest modulus value when using a security
+ * strength of 215-bits.
+ */
+#define NTRU_S215_Q_BITS	13
+int ntruenc_s215_random(short *a, int df1, int df2, short v);
+int ntruenc_s215_keygen(short *f, short *h, short *t);
+int ntruenc_s215_encrypt(short *e, short *m, short *h, short *t);
+void ntruenc_s215_decrypt(short *c, short *e, short *f, short *t);
+int ntruenc_s215_mod_inv_2(short *r, short *a);
+int ntruenc_s215_mod_inv_q(short *r, short *a);
+void ntruenc_s215_mul_mod_q(short *r, short *a, short *b);
+
+/**
+ * The number of -1 elements in a random NTRU vector mod p for a security
  * strength of 256.
  */
-#define NTRU_S256_DF		204
+#define NTRU_S256_DF		159
 /**
  * The number of -1 elements in a random NTRU vector mod p for a security
  * strength of 256 in g.
  */
-#define NTRU_S256_DG		247
+#define NTRU_S256_DG		293
 /**
  * The number of elements in an NTRU vector for a security strength of 256-bits.
  */
-#define NTRU_S256_N		743
+#define NTRU_S256_N		881
 /**
  * The largest modulus value when using a security strength of 256-bits.
  */
-#define NTRU_S256_Q		2048
+#define NTRU_S256_Q		7673
 /**
  * The number of bits to the largest modulus value when using a security
  * strength of 256-bits.
