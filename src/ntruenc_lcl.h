@@ -173,7 +173,7 @@ void ntruenc_s192_mul_mod_q(short *r, short *a, short *b);
  * The number of -1 elements in a random NTRU vector mod p for a security
  * strength of 256 in g.
  */
-#define NTRU_S256_DG		197
+#define NTRU_S256_DG		247
 /**
  * The number of elements in an NTRU vector for a security strength of 256-bits.
  */
