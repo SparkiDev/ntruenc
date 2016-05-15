@@ -28,7 +28,7 @@
 #ifdef OPT_NTRU_OPENSSL_RAND
 #include "openssl/rand.h"
 #else
-#include "ntru_sha3.h"
+#include "ntruenc_sha3.h"
 #endif
 
 /**

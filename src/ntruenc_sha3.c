@@ -21,7 +21,7 @@
  */
 
 #include <stdint.h>
-#include "ntru_sha3.h"
+#include "ntruenc_sha3.h"
 
 /**
  * Rotate a 64-bit value left.
