@@ -24,6 +24,7 @@ CFLAGS=-O3 -m64 -Wall -DCPU_X86_64 -DCC_GCC -Iinclude
 #CFLAGS=-g -m64 -Wall -DCPU_X86_64 -DCC_GCC -Iinclude
 #-DNTRUENC_SMALL_CODE
 LIBS=
+#CFLAGS+=-DOPT_NTRU_RDRAND
 #CFLAGS+=-DOPT_NTRU_OPENSSL_RAND
 #LIBS+=-lcrypto
 
@@ -34,7 +35,7 @@ NTRUENC_IMPL=ntruenc_s112.o ntruenc_s128.o ntruenc_s192.o ntruenc_s256.o $(NTRUE
 
 NTRUENC_OP_OBJ=$(NTRUENC_IMPL) $(ASM_OBJ)
 
-NTRUENC_OBJ=ntruenc.o ntruenc_meth.o $(NTRUENC_OP_OBJ) ntruenc_key.o ntruenc_kenc.o random.o
+NTRUENC_OBJ=ntruenc.o ntruenc_meth.o $(NTRUENC_OP_OBJ) ntruenc_key.o ntruenc_kenc.o random.o ntru_sha3.o
 
 %.o: src/%.c src/*.h include/*.h
 	$(CC) -c $(CFLAGS) -o $@ $<

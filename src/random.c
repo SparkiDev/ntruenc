@@ -27,6 +27,8 @@
 
 #ifdef OPT_NTRU_OPENSSL_RAND
 #include "openssl/rand.h"
+#else
+#include "ntru_sha3.h"
 #endif
 
 /**
@@ -42,11 +44,22 @@ int pseudo_random(unsigned char *r, int l)
 #ifdef OPT_NTRU_OPENSSL_RAND
     return RAND_bytes(r, l) != 1;
 #else
+#ifdef OPT_NTRU_RDRAND
     int i;
-    for (i=0; i<l; i++)
-        r[i]=random();
-    return 0;
+    uint64_t rd[4];
+
+    for (i=0; i<4; i++)
+        asm volatile ("rdrand %0" : "=r" (rd[i]));
+
+    return ntru_shake256(r, l, (unsigned char *)rd, sizeof(rd)) == 0;
+#else
+    int i;
+    static uint64_t rd[4] = { 0, 0, 0, 0 };
+
+    for (i=0; i<4 && ++rd[i] == 0; i++) ;
+
+    return ntru_shake256(r, l, (unsigned char *)rd, sizeof(rd)) == 0;
+#endif
 #endif
 }
-
 
