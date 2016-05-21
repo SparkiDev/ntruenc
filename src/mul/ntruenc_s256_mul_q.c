@@ -79,13 +79,15 @@ static void ntruenc_s256_mul_mod_q_186(short *r, short *a, short *b)
 
     ntruenc_s256_mul_mod_q_small(t1, a, b);
 
-    memset(r, 0, (2*186-1)*sizeof(*r));
-    for (i=0; i<93*2-1; i++)
-    {
-        r[i] += t1[i];
-        r[i+93] += t2[i] - t1[i] - t3[i];
-        r[i+2*93] += t3[i];
-    }
+    for (i=0; i<93; i++)
+        r[i] = t1[i];
+    for (i=0; i<93-1; i++)
+        r[i+93] = (t1[i+93] + t2[i] - t1[i] - t3[i]);
+    r[93*2-1] = (t2[93-1] - t1[93-1] - t3[93-1]);
+    for (i=0; i<93-1; i++)
+        r[i+2*93] = (t2[i+93] - t1[i+93] - t3[i+93] + t3[i]);
+    for (; i<93*2-1; i++)
+        r[i+2*93] = t3[i];
 }
 
 /**
@@ -120,13 +122,15 @@ static void ntruenc_s256_mul_mod_q_372(short *r, short *a, short *b)
 
     ntruenc_s256_mul_mod_q_186(t1, a, b);
 
-    memset(r, 0, (2*372-1)*sizeof(*r));
-    for (i=0; i<186*2-1; i++)
-    {
-        r[i] += t1[i];
-        r[i+186] += t2[i] - t1[i] - t3[i];
-        r[i+2*186] += t3[i];
-    }
+    for (i=0; i<186; i++)
+        r[i] = t1[i];
+    for (i=0; i<186-1; i++)
+        r[i+186] = (t1[i+186] + t2[i] - t1[i] - t3[i]);
+    r[186*2-1] = (t2[186-1] - t1[186-1] - t3[186-1]);
+    for (i=0; i<186-1; i++)
+        r[i+2*186] = (t2[i+186] - t1[i+186] - t3[i+186] + t3[i]);
+    for (; i<186*2-1; i++)
+        r[i+2*186] = t3[i];
 }
 
 /**
@@ -164,13 +168,13 @@ void ntruenc_s256_mul_mod_q(short *r, short *a, short *b)
 
     ntruenc_s256_mul_mod_q_372(t1, a, b);
 
-    memcpy(r, t1, 743*sizeof(*r));
+    r[0] = t1[0];
+    for (i=1,j=0; i<743; i++,j++)
+        r[i] = t1[i] + t3[j];
     for (i=372,j=0; i<743; i++,j++)
         r[i] += t2[j] - t1[j] - t3[j];
     for (i=0; j<372*2-1; i++,j++)
         r[i] += t2[j] - t1[j] - t3[j];
-    for (i=1,j=0; i<743; i++,j++)
-        r[i] += t3[j];
 
     for (i=0; i<743; i++)
     {

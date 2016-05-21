@@ -93,13 +93,13 @@ EOF
     add_ops = ""
     if c == 1
        add_ops = <<EOF
-    memcpy(r, t1, #{nf}*sizeof(*r));
+    r[0] = t1[0];
+    for (i=1,j=0; i<#{nf}; i++,j++)
+        r[i] = t1[i] + t3[j];
     for (i=#{n},j=0; i<#{nf}; i++,j++)
         r[i] += t2[j] - t1[j] - t3[j];
     for (i=0; j<#{n}*2-1; i++,j++)
         r[i] += t2[j] - t1[j] - t3[j];
-    for (i=1,j=0; i<#{nf}; i++,j++)
-        r[i] += t3[j];
 
     for (i=0; i<#{nf}; i++)
     {
@@ -109,25 +109,28 @@ EOF
 EOF
     elsif nf & 1 == 0
        add_ops = <<EOF
-    memset(r, 0, (2*#{nf}-1)*sizeof(*r));
-    for (i=0; i<#{n}*2-1; i++)
-    {
-        r[i] += t1[i];
-        r[i+#{n}] += t2[i] - t1[i] - t3[i];
-        r[i+2*#{n}] += t3[i];
-    }
+    for (i=0; i<#{n}; i++)
+        r[i] = t1[i];
+    for (i=0; i<#{n}-1; i++)
+        r[i+#{n}] = (t1[i+#{n}] + t2[i] - t1[i] - t3[i]);
+    r[#{n}*2-1] = (t2[#{n}-1] - t1[#{n}-1] - t3[#{n}-1]);
+    for (i=0; i<#{n}-1; i++)
+        r[i+2*#{n}] = (t2[i+#{n}] - t1[i+#{n}] - t3[i+#{n}] + t3[i]);
+    for (; i<#{n}*2-1; i++)
+        r[i+2*#{n}] = t3[i];
 EOF
     else
         add_ops = <<EOF
-    memset(r, 0, (2*#{nf}-1)*sizeof(*r));
-    for (i=0; i<#{n}*2-2; i++)
-    {
-        r[i] += t1[i];
-        r[i+#{n}] += t2[i] - t1[i] - t3[i];
-        r[i+2*#{n}] += t3[i];
-    }
-    r[#{n}*2-2] += t1[#{n}*2-2];
-    r[#{n}*2-2+#{n}] += t2[#{n}*2-2] - t1[#{n}*2-2];
+    t3[#{n}*2-2] = 0;
+    for (i=0; i<#{n}; i++)
+        r[i] = t1[i];
+    for (i=0; i<#{n}-1; i++)
+        r[i+#{n}] = (t1[i+#{n}] + t2[i] - t1[i] - t3[i]);
+    r[#{n}*2-1] = (t2[#{n}-1] - t1[#{n}-1] - t3[#{n}-1]);
+    for (i=0; i<#{n}-1; i++)
+        r[i+2*#{n}] = (t2[i+#{n}] - t1[i+#{n}] - t3[i+#{n}] + t3[i]);
+    for (; i<#{n}*2-1; i++)
+        r[i+2*#{n}] = t3[i];
 EOF
     end
 

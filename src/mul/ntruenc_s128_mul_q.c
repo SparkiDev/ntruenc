@@ -79,13 +79,15 @@ static void ntruenc_s128_mul_mod_q_220(short *r, short *a, short *b)
 
     ntruenc_s128_mul_mod_q_small(t1, a, b);
 
-    memset(r, 0, (2*220-1)*sizeof(*r));
-    for (i=0; i<110*2-1; i++)
-    {
-        r[i] += t1[i];
-        r[i+110] += t2[i] - t1[i] - t3[i];
-        r[i+2*110] += t3[i];
-    }
+    for (i=0; i<110; i++)
+        r[i] = t1[i];
+    for (i=0; i<110-1; i++)
+        r[i+110] = (t1[i+110] + t2[i] - t1[i] - t3[i]);
+    r[110*2-1] = (t2[110-1] - t1[110-1] - t3[110-1]);
+    for (i=0; i<110-1; i++)
+        r[i+2*110] = (t2[i+110] - t1[i+110] - t3[i+110] + t3[i]);
+    for (; i<110*2-1; i++)
+        r[i+2*110] = t3[i];
 }
 
 /**
@@ -123,13 +125,13 @@ void ntruenc_s128_mul_mod_q(short *r, short *a, short *b)
 
     ntruenc_s128_mul_mod_q_220(t1, a, b);
 
-    memcpy(r, t1, 439*sizeof(*r));
+    r[0] = t1[0];
+    for (i=1,j=0; i<439; i++,j++)
+        r[i] = t1[i] + t3[j];
     for (i=220,j=0; i<439; i++,j++)
         r[i] += t2[j] - t1[j] - t3[j];
     for (i=0; j<220*2-1; i++,j++)
         r[i] += t2[j] - t1[j] - t3[j];
-    for (i=1,j=0; i<439; i++,j++)
-        r[i] += t3[j];
 
     for (i=0; i<439; i++)
     {
