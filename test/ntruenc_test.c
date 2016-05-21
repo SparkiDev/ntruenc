@@ -328,7 +328,7 @@ int test_ntruenc(int strength, int flags, int speed)
         {
             printf(",Diff (%d, %d/%d)", i, dec[i], data[i]);
             ret = 1;
-            break;//goto end;
+            goto end;
         }
     }
     fprintf(stderr, ",%d", olen);
