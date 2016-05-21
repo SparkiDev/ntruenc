@@ -88,11 +88,6 @@ int ntruenc_meths_get(short strength, int flags, NTRUENC_METHS **meths);
  * The largest modulus value when using a security strength of 112-bits.
  */
 #define NTRU_S112_Q		6833
-/**
- * The number of bits to the largest modulus value when using a security
- * strength of 112-bits.
- */
-#define NTRU_S112_Q_BITS	13
 int ntruenc_s112_random(short *a, int df1, int df2, short v);
 int ntruenc_s112_keygen(short *f, short *h, short *t);
 int ntruenc_s112_encrypt(short *e, short *m, short *h, short *t);
@@ -120,11 +115,6 @@ void ntruenc_s112_mul_mod_q(short *r, short *a, short *b);
  * The largest modulus value when using a security strength of 128-bits.
  */
 #define NTRU_S128_Q		6287
-/**
- * The number of bits to the largest modulus value when using a security
- * strength of 128-bits.
- */
-#define NTRU_S128_Q_BITS	13
 int ntruenc_s128_random(short *a, int df1, int df2, short v);
 int ntruenc_s128_keygen(short *f, short *h, short *t);
 int ntruenc_s128_encrypt(short *e, short *m, short *h, short *t);
@@ -151,11 +141,6 @@ void ntruenc_s128_mul_mod_q(short *r, short *a, short *b);
  * The largest modulus value when using a security strength of 192-bits.
  */
 #define NTRU_S192_Q		7481
-/**
- * The number of bits to the largest modulus value when using a security
- * strength of 192-bits.
- */
-#define NTRU_S192_Q_BITS	11
 int ntruenc_s192_random(short *a, int df1, int df2, short v);
 int ntruenc_s192_keygen(short *f, short *h, short *t);
 int ntruenc_s192_encrypt(short *e, short *m, short *h, short *t);
@@ -182,11 +167,6 @@ void ntruenc_s192_mul_mod_q(short *r, short *a, short *b);
  * The largest modulus value when using a security strength of 215-bits.
  */
 #define NTRU_S215_Q		9829
-/**
- * The number of bits to the largest modulus value when using a security
- * strength of 215-bits.
- */
-#define NTRU_S215_Q_BITS	13
 int ntruenc_s215_random(short *a, int df1, int df2, short v);
 int ntruenc_s215_keygen(short *f, short *h, short *t);
 int ntruenc_s215_encrypt(short *e, short *m, short *h, short *t);
@@ -213,11 +193,6 @@ void ntruenc_s215_mul_mod_q(short *r, short *a, short *b);
  * The largest modulus value when using a security strength of 256-bits.
  */
 #define NTRU_S256_Q		7673
-/**
- * The number of bits to the largest modulus value when using a security
- * strength of 256-bits.
- */
-#define NTRU_S256_Q_BITS	11
 int ntruenc_s256_random(short *a, int df1, int df2, short v);
 int ntruenc_s256_keygen(short *f, short *h, short *t);
 int ntruenc_s256_encrypt(short *e, short *m, short *h, short *t);

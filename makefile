@@ -22,7 +22,7 @@
 CC=gcc
 CFLAGS=-O3 -m64 -Wall -DCPU_X86_64 -DCC_GCC -Iinclude
 #CFLAGS=-g -m64 -Wall -DCPU_X86_64 -DCC_GCC -Iinclude
-#-DNTRUENC_SMALL_CODE
+#CFLAGS+=-DNTRUENC_SMALL_CODE
 LIBS=
 #CFLAGS+=-DOPT_NTRU_RDRAND
 #CFLAGS+=-DOPT_NTRU_OPENSSL_RAND
@@ -30,8 +30,9 @@ LIBS=
 
 all: ntruenc_test
 
-NTRUENC_MUL_Q=ntruenc_s112_mul_q.o ntruenc_s128_mul_q.o ntruenc_s192_mul_q.o ntruenc_s256_mul_q.o
-NTRUENC_IMPL=ntruenc_s112.o ntruenc_s128.o ntruenc_s192.o ntruenc_s256.o $(NTRUENC_MUL_Q)
+NTRUENC_MUL_Q=ntruenc_s112_mul_q.o ntruenc_s128_mul_q.o ntruenc_s192_mul_q.o ntruenc_s215_mul_q.o ntruenc_s256_mul_q.o
+NTRUENC_INV_Q=ntruenc_s112_inv_q.o ntruenc_s128_inv_q.o ntruenc_s192_inv_q.o ntruenc_s215_inv_q.o ntruenc_s256_inv_q.o
+NTRUENC_IMPL=ntruenc_s112.o ntruenc_s128.o ntruenc_s192.o ntruenc_s215.o ntruenc_s256.o $(NTRUENC_MUL_Q) $(NTRUENC_INV_Q)
 
 NTRUENC_OP_OBJ=$(NTRUENC_IMPL) $(ASM_OBJ)
 
@@ -46,6 +47,8 @@ src/mul/ntruenc_s128_mul_q.c: src/mul/ntruenc_kara.rb
 	ruby src/mul/ntruenc_kara.rb 128 >src/mul/ntruenc_s128_mul_q.c
 src/mul/ntruenc_s192_mul_q.c: src/mul/ntruenc_kara.rb
 	ruby src/mul/ntruenc_kara.rb 192 >src/mul/ntruenc_s192_mul_q.c
+src/mul/ntruenc_s215_mul_q.c: src/mul/ntruenc_kara.rb
+	ruby src/mul/ntruenc_kara.rb 215 >src/mul/ntruenc_s215_mul_q.c
 src/mul/ntruenc_s256_mul_q.c: src/mul/ntruenc_kara.rb
 	ruby src/mul/ntruenc_kara.rb 256 >src/mul/ntruenc_s256_mul_q.c
 ntruenc_s112_mul_q.o: src/mul/ntruenc_s112_mul_q.c src/*.h include/*.h
@@ -54,7 +57,30 @@ ntruenc_s128_mul_q.o: src/mul/ntruenc_s128_mul_q.c src/*.h include/*.h
 	$(CC) -c $(CFLAGS) -Isrc -o $@ $<
 ntruenc_s192_mul_q.o: src/mul/ntruenc_s192_mul_q.c src/*.h include/*.h
 	$(CC) -c $(CFLAGS) -Isrc -o $@ $<
+ntruenc_s215_mul_q.o: src/mul/ntruenc_s215_mul_q.c src/*.h include/*.h
+	$(CC) -c $(CFLAGS) -Isrc -o $@ $<
 ntruenc_s256_mul_q.o: src/mul/ntruenc_s256_mul_q.c src/*.h include/*.h
+	$(CC) -c $(CFLAGS) -Isrc -o $@ $<
+
+src/inv/ntruenc_s112_inv_q.c: src/inv/ntruenc_inv.rb
+	ruby src/inv/ntruenc_inv.rb 112 >src/inv/ntruenc_s112_inv_q.c
+src/inv/ntruenc_s128_inv_q.c: src/inv/ntruenc_inv.rb
+	ruby src/inv/ntruenc_inv.rb 128 >src/inv/ntruenc_s128_inv_q.c
+src/inv/ntruenc_s192_inv_q.c: src/inv/ntruenc_inv.rb
+	ruby src/inv/ntruenc_inv.rb 192 >src/inv/ntruenc_s192_inv_q.c
+src/inv/ntruenc_s215_inv_q.c: src/inv/ntruenc_inv.rb
+	ruby src/inv/ntruenc_inv.rb 215 >src/inv/ntruenc_s215_inv_q.c
+src/inv/ntruenc_s256_inv_q.c: src/inv/ntruenc_inv.rb
+	ruby src/inv/ntruenc_inv.rb 256 >src/inv/ntruenc_s256_inv_q.c
+ntruenc_s112_inv_q.o: src/inv/ntruenc_s112_inv_q.c src/*.h include/*.h
+	$(CC) -c $(CFLAGS) -Isrc -o $@ $<
+ntruenc_s128_inv_q.o: src/inv/ntruenc_s128_inv_q.c src/*.h include/*.h
+	$(CC) -c $(CFLAGS) -Isrc -o $@ $<
+ntruenc_s192_inv_q.o: src/inv/ntruenc_s192_inv_q.c src/*.h include/*.h
+	$(CC) -c $(CFLAGS) -Isrc -o $@ $<
+ntruenc_s215_inv_q.o: src/inv/ntruenc_s215_inv_q.c src/*.h include/*.h
+	$(CC) -c $(CFLAGS) -Isrc -o $@ $<
+ntruenc_s256_inv_q.o: src/inv/ntruenc_s256_inv_q.c src/*.h include/*.h
 	$(CC) -c $(CFLAGS) -Isrc -o $@ $<
 
 ntruenc_test.o: test/ntruenc_test.c

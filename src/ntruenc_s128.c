@@ -26,16 +26,13 @@
 #define NTRU_DF			NTRU_S128_DF
 #define NTRU_DG			NTRU_S128_DG
 #define NTRU_Q			NTRU_S128_Q
-#define NTRU_Q_BITS		NTRU_S128_Q_BITS
 #define NTRUENC_KEYGEN		ntruenc_s128_keygen
 #define NTRUENC_ENCRYPT		ntruenc_s128_encrypt
 #define NTRUENC_DECRYPT		ntruenc_s128_decrypt
-#define NTRUENC_MOD_INV_2	ntruenc_s128_mod_inv_2
 #define NTRUENC_MOD_INV_Q	ntruenc_s128_mod_inv_q
 #define NTRUENC_MUL_MOD_Q	ntruenc_s128_mul_mod_q
 #define NTRUENC_RANDOM		ntruenc_s128_random
 
 #include "ntruenc_rand.h"
-#include "ntruenc_inv.h"
 #include "ntruenc_alg.h"
 

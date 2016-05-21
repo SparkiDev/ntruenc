@@ -41,6 +41,10 @@ NTRUENC_METHS ntruenc_meths[] =
     { 192, 0,
       1, 1, 2,
       ntruenc_s192_encrypt, ntruenc_s192_decrypt, ntruenc_s192_keygen },
+    /* Security strength 215 in C. */
+    { 215, 0,
+      1, 1, 2,
+      ntruenc_s215_encrypt, ntruenc_s215_decrypt, ntruenc_s215_keygen },
     /* Security strength 256 in C. */
     { 256, 0,
       1, 1, 2,

@@ -16,7 +16,7 @@
 #endif
 
 /* Valid strength values for test. */
-static int valid[] = {112, 128, 192, 256};
+static int valid[] = {112, 128, 192, 215, 256};
 /* The number of valid values for test. */
 #define VALID_NUM    (int)(sizeof(valid)/sizeof(*valid))
 
@@ -167,15 +167,15 @@ void keygen_cycles(NTRUENC *ne, NTRUENC_PARAMS *params,
 
     NTRUENC_keygen_init(ne, params);
     /* Prime the caches, etc */
-    for (i=0; i<100; i++)
+    for (i=0; i<50; i++)
         NTRUENC_keygen(ne, &priv_key, &pub_key);
 
     /* Approximate number of ops in a second. */
     start = get_cycles();
-    for (i=0; i<100; i++)
+    for (i=0; i<50; i++)
         NTRUENC_keygen(ne, &priv_key, &pub_key);
     end = get_cycles();
-    num_ops = cps/((end-start)/100);
+    num_ops = cps/((end-start)/50);
 
     /* Perform about 1 seconds worth of operations. */
     start = get_cycles();
@@ -328,7 +328,7 @@ int test_ntruenc(int strength, int flags, int speed)
         {
             printf(",Diff (%d, %d/%d)", i, dec[i], data[i]);
             ret = 1;
-            goto end;
+            break;//goto end;
         }
     }
     fprintf(stderr, ",%d", olen);

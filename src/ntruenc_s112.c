@@ -26,16 +26,13 @@
 #define NTRU_DF			NTRU_S112_DF
 #define NTRU_DG			NTRU_S112_DG
 #define NTRU_Q			NTRU_S112_Q
-#define NTRU_Q_BITS		NTRU_S112_Q_BITS
 #define NTRUENC_KEYGEN		ntruenc_s112_keygen
 #define NTRUENC_ENCRYPT		ntruenc_s112_encrypt
 #define NTRUENC_DECRYPT		ntruenc_s112_decrypt
-#define NTRUENC_MOD_INV_2	ntruenc_s112_mod_inv_2
 #define NTRUENC_MOD_INV_Q	ntruenc_s112_mod_inv_q
 #define NTRUENC_MUL_MOD_Q	ntruenc_s112_mul_mod_q
 #define NTRUENC_RANDOM		ntruenc_s112_random
 
 #include "ntruenc_rand.h"
-#include "ntruenc_inv.h"
 #include "ntruenc_alg.h"
 

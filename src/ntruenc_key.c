@@ -34,11 +34,13 @@ NTRUENC_PARAMS ntruenc_params[] =
     /* Security strength: 112-bits */
     { 112, NTRU_S112_N, NTRU_S112_DF, NTRU_S112_DG, NTRU_S112_Q },
     /* Security strength: 128-bits */
-    { 128, NTRU_S128_N, NTRU_S128_DF, NTRU_S128_DG, NTRU_S112_Q },
+    { 128, NTRU_S128_N, NTRU_S128_DF, NTRU_S128_DG, NTRU_S128_Q },
     /* Security strength: 192-bits */
-    { 192, NTRU_S192_N, NTRU_S192_DF, NTRU_S192_DG, NTRU_S112_Q },
+    { 192, NTRU_S192_N, NTRU_S192_DF, NTRU_S192_DG, NTRU_S192_Q },
+    /* Security strength: 215-bits */
+    { 215, NTRU_S215_N, NTRU_S215_DF, NTRU_S215_DG, NTRU_S215_Q },
     /* Security strength: 256-bits */
-    { 256, NTRU_S256_N, NTRU_S256_DF, NTRU_S256_DG, NTRU_S112_Q }
+    { 256, NTRU_S256_N, NTRU_S256_DF, NTRU_S256_DG, NTRU_S256_Q }
 };
 /**
  * The number of parameters.
@@ -326,7 +328,7 @@ int NTRUENC_PUB_KEY_get_enc_len(NTRUENC_PUB_KEY *key, int *len)
         goto end;
     }
 
-    *len = (key->params->n * 12 + 7) / 8;
+    *len = (key->params->n * 16 + 7) / 8;
 end:
     return ret;
 }

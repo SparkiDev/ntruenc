@@ -23,8 +23,9 @@
 
 class NTRUENC_Karatsuba
 
-  def initialize(str, n, r)
+  def initialize(str, q, n, r)
     @str = str
+    @q = q
     @n = n
     @r = r
     @s = [n]
@@ -45,20 +46,23 @@ class NTRUENC_Karatsuba
  * @param [in] a  The first operand.
  * @param [in] b  The second operand.
  */
-static void ntruenc_s#{@str}_mul_mod_q_small(short *r, short *a, short *b)
+static void ntruenc_s#{@str}_mul_mod_q_small(int32_t *r, int32_t *a, int32_t *b)
 {
     int i, j;
-    short *p;
+    int64_t *p;
+    int64_t t[#{n}*2];
 
     for (j=0; j<#{n}; j++)
-        r[j] = a[0] * b[j];
+        t[j] = (int64_t)a[0] * b[j];
     for (i=1; i<#{n}; i++)
     {
-        r[i+#{n}-1] = 0;
-        p = &r[i];
+        t[i+#{n}-1] = 0;
+        p = &t[i];
         for (j=0; j<#{n}; j++)
-            p[j] += a[i] * b[j];
+            p[j] += (int64_t)a[i] * b[j];
     }
+    for (i=0; i<#{n}*2-1; i++)
+        r[i] = t[i] % (NTRU_S#{@str}_Q);
 }
 EOF
   end
@@ -81,6 +85,8 @@ EOF
     func += "_#{nf}" if c != 1
     static_decl = ""
     static_decl = "static " if c != 1
+    res_type = "short"
+    res_type = "int32_t" if c != 1
     next_func = "ntruenc_s#{@str}_mul_mod_q_"
     if c == @r
       next_func += "small"
@@ -93,41 +99,46 @@ EOF
     add_ops = ""
     if c == 1
        add_ops = <<EOF
-    memcpy(r, t1, #{nf}*sizeof(*r));
-    for (i=#{n},j=0; i<#{nf}; i++,j++)
-        r[i] += t2[j] - t1[j] - t3[j];
-    for (i=0; j<#{n}*2-1; i++,j++)
-        r[i] += t2[j] - t1[j] - t3[j];
+    r[0] = t1[0];
     for (i=1,j=0; i<#{nf}; i++,j++)
-        r[i] += t3[j];
+        r[i] = (t1[i] + t3[j]) % NTRU_S#{@str}_Q;
+    for (i=#{n},j=0; i<#{nf}; i++,j++)
+        r[i] = (r[i] + t2[j] - t1[j] - t3[j]) % NTRU_S#{@str}_Q;
+    for (i=0; j<#{n}*2-1; i++,j++)
+        r[i] = (r[i] + t2[j] - t1[j] - t3[j]) % NTRU_S#{@str}_Q;
 
     for (i=0; i<#{nf}; i++)
     {
-        r[i] &= NTRU_S#{@str}_Q-1;
-        r[i] |= 0 - (r[i] & (1<<(NTRU_S#{@str}_Q_BITS-1)));
+        if (r[i] > NTRU_S#{@str}_Q / 2)
+            r[i] = -(NTRU_S#{@str}_Q - r[i]);
+        if (r[i] < -NTRU_S#{@str}_Q / 2)
+            r[i] = NTRU_S#{@str}_Q + r[i];
     }
 EOF
     elsif nf & 1 == 0
        add_ops = <<EOF
-    memset(r, 0, (2*#{nf}-1)*sizeof(*r));
-    for (i=0; i<#{n}*2-1; i++)
-    {
-        r[i] += t1[i];
-        r[i+#{n}] += t2[i] - t1[i] - t3[i];
-        r[i+2*#{n}] += t3[i];
-    }
+    for (i=0; i<#{n}; i++)
+        r[i] = t1[i];
+    for (i=0; i<#{n}-1; i++)
+        r[i+#{n}] = (t1[i+#{n}] + t2[i] - t1[i] - t3[i]);
+    r[#{n}*2-1] = (t2[#{n}-1] - t1[#{n}-1] - t3[#{n}-1]);
+    for (i=0; i<#{n}-1; i++)
+        r[i+2*#{n}] = (t2[i+#{n}] - t1[i+#{n}] - t3[i+#{n}] + t3[i]);
+    for (; i<#{n}*2-1; i++)
+        r[i+2*#{n}] = t3[i];
 EOF
     else
         add_ops = <<EOF
-    memset(r, 0, (2*#{nf}-1)*sizeof(*r));
-    for (i=0; i<#{n}*2-2; i++)
-    {
-        r[i] += t1[i];
-        r[i+#{n}] += t2[i] - t1[i] - t3[i];
-        r[i+2*#{n}] += t3[i];
-    }
-    r[#{n}*2-2] += t1[#{n}*2-2];
-    r[#{n}*2-2+#{n}] += t2[#{n}*2-2] - t1[#{n}*2-2];
+    t3[#{n}*2-2] = 0;
+    for (i=0; i<#{n}; i++)
+        r[i] = t1[i];
+    for (i=0; i<#{n}-1; i++)
+        r[i+#{n}] = (t1[i+#{n}] + t2[i] - t1[i] - t3[i]);
+    r[#{n}*2-1] = (t2[#{n}-1] - t1[#{n}-1] - t3[#{n}-1]);
+    for (i=0; i<#{n}-1; i++)
+        r[i+2*#{n}] = (t2[i+#{n}] - t1[i+#{n}] - t3[i+#{n}] + t3[i]);
+    for (; i<#{n}*2-1; i++)
+        r[i+2*#{n}] = t3[i];
 EOF
     end
 
@@ -141,14 +152,14 @@ EOF
  * @param [in] a  The first operand.
  * @param [in] b  The second operand.
  */
-#{static_decl}void #{func}(short *r, short *a, short *b)
+#{static_decl}void #{func}(#{res_type} *r, #{res_type} *a, #{res_type} *b)
 {
     int i#{dec_j};
-    short t1[2*#{n}-1];
-    short t2[2*#{n}-1];
-    short t3[2*#{n}-1];
-    short aa[#{n}];
-    short bb[#{n}];
+    int32_t t1[2*#{n}-1];
+    int32_t t2[2*#{n}-1];
+    int32_t t3[2*#{n}-1];
+    int32_t aa[#{n}];
+    int32_t bb[#{n}];
 
     for (i=0; i<#{nm}; i++)
     {
@@ -159,12 +170,27 @@ EOF
 
     for (i=0; i<#{n}; i++)
     {
-        aa[i] += a[i];
-        bb[i] += b[i];
+        aa[i] = aa[i] + a[i];
+        bb[i] = bb[i] + b[i];
     }
     #{next_func}(t2, aa, bb);
 
+EOF
+    if (c == 1)
+      puts <<EOF
+    for (i=0; i<#{nm}; i++)
+    {
+        aa[i] = a[i];
+        bb[i] = b[i];
+    }
+    #{next_func}(t1, aa, bb);
+EOF
+    else
+      puts <<EOF
     #{next_func}(t1, a, b);
+EOF
+    end
+    puts <<EOF
 
 #{add_ops}}
 EOF
@@ -173,6 +199,7 @@ EOF
   def write_mul()
     File.readlines(File.dirname(__FILE__)+'/../../rubyasm/license.c').each { |l| puts l }
     puts "#include <string.h>"
+    puts "#include <stdint.h>"
     puts "#include \"ntruenc_lcl.h\""
     puts
     puts "#ifndef NTRUENC_SMALL_CODE"
@@ -191,21 +218,29 @@ s = ARGV[0].to_i
 
 case s
 when 112
-  n=401
-  r=2
-when 128
+  q=6833
   n=439
-  r=2
+  r=6
+when 128
+  q=6287
+  n=491
+  r=6
 when 192
-  n=593
-  r=3
+  q=7481
+  n=659
+  r=6
+when 215
+  q=9829
+  n=739
+  r=7
 when 256
-  n=743
-  r=3
+  q=7673
+  n=881
+  r=7
 else
-  throw "Invalid strength: #{ARGV[0]} (112|128|192|256)"
+  throw "Invalid strength: #{ARGV[0]} (112|128|192|215|256)"
 end
 
-nek = NTRUENC_Karatsuba.new(s, n, r)
+nek = NTRUENC_Karatsuba.new(s, q, n, r)
 nek.write_mul()
 

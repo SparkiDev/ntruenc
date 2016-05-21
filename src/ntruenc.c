@@ -244,10 +244,12 @@ static int ntruenc_decode_msg(short *m, int n, unsigned char *data, int len,
     if (data == NULL)
         goto end;
 
-    if ((dlen + 2) * 8 > n)
+    if (((dlen + 2) * 8 > n) || (dlen < 0))
     {
         ret = NTRU_ERR_BAD_DATA;
-        dlen = n-10;
+        dlen = (n / 8) - 2 - 2;
+        if (len < dlen)
+            dlen = len;
     }
 
     zlen = (n - (dlen + 2) * 8) / 8;
@@ -323,6 +325,7 @@ end:
 static int ntruenc_encode_encrypted(short *enc, int n, unsigned char *data,
     int len)
 {
+#if 0
     int ret = 0;
     int i, j;
 
@@ -346,6 +349,18 @@ static int ntruenc_encode_encrypted(short *enc, int n, unsigned char *data,
 
 end:
     return ret;
+#else
+    int ret = 0;
+
+    if (len < (n * 2))
+    {
+        ret = NTRU_ERR_BAD_LEN;
+        goto end;
+    }
+    memcpy(data, enc, n * 2);
+end:
+    return ret;
+#endif
 }
 
 /**
@@ -363,6 +378,7 @@ end:
 static int ntruenc_decode_encrypted(unsigned char *data, int len, int n,
     short *enc)
 {
+#if 0
     int ret = 0;
     int i, j;
 
@@ -382,6 +398,18 @@ static int ntruenc_decode_encrypted(unsigned char *data, int len, int n,
 
 end:
     return ret;
+#else
+    int ret = 0;
+
+    if (len < (n*2))
+    {
+        ret = NTRU_ERR_BAD_LEN;
+        goto end;
+    }
+    memcpy(enc, data, n * 2);
+end:
+    return ret;
+#endif
 }
 
 /**

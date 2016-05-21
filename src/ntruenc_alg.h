@@ -21,6 +21,7 @@
  */
 
 #include <string.h>
+#include <stdint.h>
 
 /**
  * The data needed to convert a number mod 3 to a number in the range: -1..1.
@@ -50,50 +51,33 @@ static short *neg_mod_3 = &neg_mod_3_data[2];
 void NTRUENC_MUL_MOD_Q(short *r, short *a, short *b)
 {
     int i, j;
-    short *p;
-    short t[NTRU_N*2];
+    int64_t *p;
+    int64_t t[NTRU_N*2];
 
-    memset(t, 0, sizeof(t));
-    for (i=0; i<NTRU_N; i++)
+    for (j=0; j<NTRU_N; j++)
+        t[j] = (int32_t)a[0] * b[j];
+    for (i=1; i<NTRU_N; i++)
     {
+        t[i+NTRU_N-1] = 0;
         p = &t[i];
         for (j=0; j<NTRU_N; j++)
-            p[j] += a[i] * b[j];
+            p[j] += (int32_t)a[i] * b[j];
     }
-    for (i=0; i<NTRU_N; i++)
+    for (i=0; i<NTRU_N-1; i++)
     {
-        r[i] = (t[i] + t[i+NTRU_N]) & (NTRU_Q-1);
-        r[i] |= 0 - (r[i] & (1<<(NTRU_Q_BITS-1)));
+        r[i] = (t[i] + t[i+NTRU_N]) % NTRU_Q;
+        if (r[i] > NTRU_Q / 2)
+            r[i] = -(NTRU_Q - r[i]);
+        if (r[i] < -NTRU_Q / 2)
+            r[i] = NTRU_Q + r[i];
     }
+    r[NTRU_N-1] = t[NTRU_N-1] % NTRU_Q;
+    if (r[NTRU_N-1] > NTRU_Q / 2)
+        r[NTRU_N-1] = -(NTRU_Q - r[NTRU_N-1]);
+    if (r[NTRU_N-1] < -NTRU_Q / 2)
+        r[NTRU_N-1] = NTRU_Q + r[NTRU_N-1];
 }
 #endif
-
-/**
- * Invert the vector mod q.
- *
- * @param [in] fq  The inverse mod q.
- * @param [in] f   The vector to invert.
- * @return  NTRU_ERR_NO_INVERSE if there is no inverse.<br>
- *          0 on success.
- */
-int NTRUENC_MOD_INV_Q(short *fq, short *f)
-{
-    int ret;
-    int i;
-    short t[NTRU_N];
-
-    ret = NTRUENC_MOD_INV_2(fq, f);
-    if (ret != 0) return ret;
-
-    for (i=0; i<4; i++)
-    {
-        NTRUENC_MUL_MOD_Q(t, f, fq);
-        t[0] += 2;
-        NTRUENC_MUL_MOD_Q(fq, fq, t);
-    }
-
-    return 0;
-}
 
 /**
  * Generate public and private key values.
@@ -153,8 +137,11 @@ int NTRUENC_ENCRYPT(short *e, short *m, short *h, short *t)
     /* Add in message/key and ensure the values are in the right range. */
     for (i=0; i<NTRU_N; i++)
     {
-        e[i] = (e[i] + m[i]) & (NTRU_Q-1);
-        e[i] |= 0 - (e[i] & (1<<(NTRU_Q_BITS-1)));
+        e[i] = (e[i] + m[i]) % NTRU_Q;
+        if (e[i] > NTRU_Q / 2)
+            e[i] = -(NTRU_Q - e[i]);
+        if (e[i] < -NTRU_Q / 2)
+            e[i] = NTRU_Q + e[i];
     }
 
     return 0;

@@ -27,16 +27,17 @@
 #include "ntruenc_key_lcl.h"
 
 /**
- * Encodes an NTRU vector as packed 12-bit data.
+ * Encodes an NTRU vector as packed 14-bit data.
  *
  * @param [in]  a     The NTRU vector.
  * @param [in]  n     The number of elements in the NTRU vector.
  * @param [in]  data  The buffer to hold encoded data.
  * @param [out] len   The number of bytes of encoded data.
  */
-static void ntruenc_encode_12bits(short *a, int n, unsigned char *data,
+static void ntruenc_encode_14bits(short *a, int n, unsigned char *data,
     int *len)
 {
+#if 0
     int i, j;
 
     for (i=0,j=0; i<(n/2)*2; i+=2,j+=3)
@@ -53,19 +54,25 @@ static void ntruenc_encode_12bits(short *a, int n, unsigned char *data,
     }
     if (len != NULL)
         *len = j;
+#else
+    memcpy(data, a, n * 2);
+    if (len != NULL)
+        *len = n * 2;
+#endif
 }
 
 /**
- * Decodes packed 12-bit data into an NTRU vector.
+ * Decodes packed 14-bit data into an NTRU vector.
  *
  * @param [in]  data  The buffer holding the encoded data.
  * @param [in]  n     The number of elements in the NTRU vector.
  * @param [in]  a     The NTRU vector.
  * @param [out] len   The number of bytes of encoded data.
  */
-static void ntruenc_decode_12bits(unsigned char *data, int n, short *a,
+static void ntruenc_decode_14bits(unsigned char *data, int n, short *a,
     int *len)
 {
+#if 0
     int i, j;
 
     for (i=0,j=0; i<(n/2)*2; i+=2,j+=3)
@@ -80,6 +87,11 @@ static void ntruenc_decode_12bits(unsigned char *data, int n, short *a,
     }
     if (len != NULL)
         *len = j;
+#else
+    memcpy(a, data, n * 2);
+    if (len != NULL)
+        *len = n * 2;
+#endif
 }
 
 /**
@@ -101,7 +113,7 @@ int NTRUENC_PRIV_KEY_get_len(NTRUENC_PRIV_KEY *key, int *len)
         goto end;
     }
 
-    *len = (n*12+6)/8;
+    *len = (n*16+6)/8;
 end:
     return ret;
 }
@@ -130,8 +142,8 @@ int NTRUENC_PRIV_KEY_encode(NTRUENC_PRIV_KEY *key, unsigned char *data, int len)
         goto end;
     }
 
-    /* f is 12-bits */
-    if (len < (n*12+6)/8)
+    /* f is 14-bits */
+    if (len < (n*16+6)/8)
     {
         ret = NTRU_ERR_BAD_LEN;
         goto end;
@@ -143,7 +155,7 @@ int NTRUENC_PRIV_KEY_encode(NTRUENC_PRIV_KEY *key, unsigned char *data, int len)
         goto end;
     }
 
-    ntruenc_encode_12bits(key->f, n, data, NULL);
+    ntruenc_encode_14bits(key->f, n, data, NULL);
 end:
     return ret;
 }
@@ -170,8 +182,8 @@ int NTRUENC_PRIV_KEY_decode(NTRUENC_PRIV_KEY *key, unsigned char *data, int len)
         goto end;
     }
 
-    /* f is 12-bits */
-    if (len < (n*12+6)/8)
+    /* f is 14-bits */
+    if (len < (n*16+6)/8)
     {
         ret = NTRU_ERR_BAD_LEN;
         goto end;
@@ -184,7 +196,7 @@ int NTRUENC_PRIV_KEY_decode(NTRUENC_PRIV_KEY *key, unsigned char *data, int len)
         goto end;
     }
 
-    ntruenc_decode_12bits(data, n, key->f, NULL);
+    ntruenc_decode_14bits(data, n, key->f, NULL);
 end:
     return ret;
 }
@@ -209,7 +221,7 @@ int NTRUENC_PUB_KEY_get_len(NTRUENC_PUB_KEY *key, int *len)
         goto end;
     }
 
-    *len = (n*12+6)/8;
+    *len = (n*16+6)/8;
 end:
     return ret;
 }
@@ -238,8 +250,8 @@ int NTRUENC_PUB_KEY_encode(NTRUENC_PUB_KEY *key, unsigned char *data, int len)
         goto end;
     }
 
-    /* h is 12-bits */
-    if (len < (n*12+6)/8)
+    /* h is 14-bits */
+    if (len < (n*16+6)/8)
     {
         ret = NTRU_ERR_BAD_LEN;
         goto end;
@@ -251,7 +263,7 @@ int NTRUENC_PUB_KEY_encode(NTRUENC_PUB_KEY *key, unsigned char *data, int len)
         goto end;
     }
 
-    ntruenc_encode_12bits(key->h, n, data, NULL);
+    ntruenc_encode_14bits(key->h, n, data, NULL);
 end:
     return ret;
 }
@@ -278,8 +290,8 @@ int NTRUENC_PUB_KEY_decode(NTRUENC_PUB_KEY *key, unsigned char *data, int len)
         goto end;
     }
 
-    /* y is 12-bits, r1 is 2-bits */
-    if (len < (n*12+6)/8)
+    /* y is 14-bits */
+    if (len < (n*16+6)/8)
     {
         ret = NTRU_ERR_BAD_LEN;
         goto end;
@@ -292,7 +304,7 @@ int NTRUENC_PUB_KEY_decode(NTRUENC_PUB_KEY *key, unsigned char *data, int len)
         goto end;
     }
 
-    ntruenc_decode_12bits(data, n, key->h, NULL);
+    ntruenc_decode_14bits(data, n, key->h, NULL);
 end:
     return ret;
 }
