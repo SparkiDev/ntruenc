@@ -549,9 +549,9 @@ int NTRUENC_decrypt_init(NTRUENC *ne, NTRUENC_PRIV_KEY *priv)
         goto end;
     }
 
-    if (ne->meths->enc_num > 0)
+    if (ne->meths->dec_num > 0)
     {
-        ne->t = malloc(priv->params->n * sizeof(short) * ne->meths->enc_num);
+        ne->t = malloc(priv->params->n * sizeof(short) * ne->meths->dec_num);
         if (ne->t == NULL)
         {
             ret = NTRU_ERR_ALLOC;
