@@ -88,7 +88,6 @@ static void ntruenc_s215_mul_mod_q_93(int64_t *r, int16_t *a, int16_t *b,
 
     ntruenc_s215_mul_mod_q_small(t1, a, b, t);
 
-    t3[47*2-2] = 0;
     for (i=0; i<47; i++)
         r[i] = t1[i];
     for (i=0; i<47-1; i++)
@@ -96,7 +95,7 @@ static void ntruenc_s215_mul_mod_q_93(int64_t *r, int16_t *a, int16_t *b,
     r[47*2-1] = (t2[47-1] - t1[47-1] - t3[47-1]);
     for (i=0; i<47-1; i++)
         r[i+2*47] = (t2[i+47] - t1[i+47] - t3[i+47] + t3[i]);
-    for (; i<47*2-1; i++)
+    for (; i<47*2-2; i++)
         r[i+2*47] = t3[i];
 }
 
@@ -138,7 +137,6 @@ static void ntruenc_s215_mul_mod_q_185(int64_t *r, int16_t *a, int16_t *b,
 
     ntruenc_s215_mul_mod_q_93(t1, a, b, t);
 
-    t3[93*2-2] = 0;
     for (i=0; i<93; i++)
         r[i] = t1[i];
     for (i=0; i<93-1; i++)
@@ -146,7 +144,7 @@ static void ntruenc_s215_mul_mod_q_185(int64_t *r, int16_t *a, int16_t *b,
     r[93*2-1] = (t2[93-1] - t1[93-1] - t3[93-1]);
     for (i=0; i<93-1; i++)
         r[i+2*93] = (t2[i+93] - t1[i+93] - t3[i+93] + t3[i]);
-    for (; i<93*2-1; i++)
+    for (; i<93*2-2; i++)
         r[i+2*93] = t3[i];
 }
 

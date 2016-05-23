@@ -131,7 +131,6 @@ EOF
 EOF
     else
         add_ops = <<EOF
-    t3[#{n}*2-2] = 0;
     for (i=0; i<#{n}; i++)
         r[i] = t1[i];
     for (i=0; i<#{n}-1; i++)
@@ -139,7 +138,7 @@ EOF
     r[#{n}*2-1] = (t2[#{n}-1] - t1[#{n}-1] - t3[#{n}-1]);
     for (i=0; i<#{n}-1; i++)
         r[i+2*#{n}] = (t2[i+#{n}] - t1[i+#{n}] - t3[i+#{n}] + t3[i]);
-    for (; i<#{n}*2-1; i++)
+    for (; i<#{n}*2-2; i++)
         r[i+2*#{n}] = t3[i];
 EOF
     end

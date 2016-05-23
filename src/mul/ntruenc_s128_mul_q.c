@@ -134,7 +134,6 @@ static void ntruenc_s128_mul_mod_q_123(int64_t *r, int16_t *a, int16_t *b,
 
     ntruenc_s128_mul_mod_q_62(t1, a, b, t);
 
-    t3[62*2-2] = 0;
     for (i=0; i<62; i++)
         r[i] = t1[i];
     for (i=0; i<62-1; i++)
@@ -142,7 +141,7 @@ static void ntruenc_s128_mul_mod_q_123(int64_t *r, int16_t *a, int16_t *b,
     r[62*2-1] = (t2[62-1] - t1[62-1] - t3[62-1]);
     for (i=0; i<62-1; i++)
         r[i+2*62] = (t2[i+62] - t1[i+62] - t3[i+62] + t3[i]);
-    for (; i<62*2-1; i++)
+    for (; i<62*2-2; i++)
         r[i+2*62] = t3[i];
 }
 

@@ -88,7 +88,6 @@ static void ntruenc_s112_mul_mod_q_55(int64_t *r, int16_t *a, int16_t *b,
 
     ntruenc_s112_mul_mod_q_small(t1, a, b, t);
 
-    t3[28*2-2] = 0;
     for (i=0; i<28; i++)
         r[i] = t1[i];
     for (i=0; i<28-1; i++)
@@ -96,7 +95,7 @@ static void ntruenc_s112_mul_mod_q_55(int64_t *r, int16_t *a, int16_t *b,
     r[28*2-1] = (t2[28-1] - t1[28-1] - t3[28-1]);
     for (i=0; i<28-1; i++)
         r[i+2*28] = (t2[i+28] - t1[i+28] - t3[i+28] + t3[i]);
-    for (; i<28*2-1; i++)
+    for (; i<28*2-2; i++)
         r[i+2*28] = t3[i];
 }
 
