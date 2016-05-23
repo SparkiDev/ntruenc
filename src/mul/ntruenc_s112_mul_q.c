@@ -82,7 +82,6 @@ static void ntruenc_s112_mul_mod_q_201(short *r, short *a, short *b)
 
     ntruenc_s112_mul_mod_q_small(t1, a, b);
 
-    t3[101*2-2] = 0;
     for (i=0; i<101; i++)
         r[i] = t1[i];
     for (i=0; i<101-1; i++)
@@ -90,7 +89,7 @@ static void ntruenc_s112_mul_mod_q_201(short *r, short *a, short *b)
     r[101*2-1] = (t2[101-1] - t1[101-1] - t3[101-1]);
     for (i=0; i<101-1; i++)
         r[i+2*101] = (t2[i+101] - t1[i+101] - t3[i+101] + t3[i]);
-    for (; i<101*2-1; i++)
+    for (; i<101*2-2; i++)
         r[i+2*101] = t3[i];
 }
 
@@ -103,7 +102,7 @@ static void ntruenc_s112_mul_mod_q_201(short *r, short *a, short *b)
  */
 void ntruenc_s112_mul_mod_q(short *r, short *a, short *b)
 {
-    int i, j;
+    int i, j, k;
     short t1[2*201-1];
     short t2[2*201-1];
     short t3[2*201-1];
@@ -129,13 +128,12 @@ void ntruenc_s112_mul_mod_q(short *r, short *a, short *b)
 
     ntruenc_s112_mul_mod_q_201(t1, a, b);
 
-    r[0] = t1[0];
-    for (i=1,j=0; i<401; i++,j++)
-        r[i] = t1[i] + t3[j];
-    for (i=201,j=0; i<401; i++,j++)
-        r[i] += t2[j] - t1[j] - t3[j];
-    for (i=0; j<201*2-1; i++,j++)
-        r[i] += t2[j] - t1[j] - t3[j];
+    k = 401-201;
+    r[0] = t1[0] + t2[k] - t1[k] - t3[k];
+    for (i=1,j=0,k++; i<201; i++,j++,k++)
+        r[i] = t1[i] + t3[j] + t2[k] - t1[k] - t3[k];
+    for (k=0; i<401; i++,j++,k++)
+        r[i] = t1[i] + t3[j] + t2[k] - t1[k] - t3[k];
 
     for (i=0; i<401; i++)
     {

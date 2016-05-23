@@ -142,7 +142,7 @@ static void ntruenc_s256_mul_mod_q_372(short *r, short *a, short *b)
  */
 void ntruenc_s256_mul_mod_q(short *r, short *a, short *b)
 {
-    int i, j;
+    int i, j, k;
     short t1[2*372-1];
     short t2[2*372-1];
     short t3[2*372-1];
@@ -168,13 +168,12 @@ void ntruenc_s256_mul_mod_q(short *r, short *a, short *b)
 
     ntruenc_s256_mul_mod_q_372(t1, a, b);
 
-    r[0] = t1[0];
-    for (i=1,j=0; i<743; i++,j++)
-        r[i] = t1[i] + t3[j];
-    for (i=372,j=0; i<743; i++,j++)
-        r[i] += t2[j] - t1[j] - t3[j];
-    for (i=0; j<372*2-1; i++,j++)
-        r[i] += t2[j] - t1[j] - t3[j];
+    k = 743-372;
+    r[0] = t1[0] + t2[k] - t1[k] - t3[k];
+    for (i=1,j=0,k++; i<372; i++,j++,k++)
+        r[i] = t1[i] + t3[j] + t2[k] - t1[k] - t3[k];
+    for (k=0; i<743; i++,j++,k++)
+        r[i] = t1[i] + t3[j] + t2[k] - t1[k] - t3[k];
 
     for (i=0; i<743; i++)
     {

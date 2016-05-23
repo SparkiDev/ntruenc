@@ -99,7 +99,7 @@ static void ntruenc_s128_mul_mod_q_220(short *r, short *a, short *b)
  */
 void ntruenc_s128_mul_mod_q(short *r, short *a, short *b)
 {
-    int i, j;
+    int i, j, k;
     short t1[2*220-1];
     short t2[2*220-1];
     short t3[2*220-1];
@@ -125,13 +125,12 @@ void ntruenc_s128_mul_mod_q(short *r, short *a, short *b)
 
     ntruenc_s128_mul_mod_q_220(t1, a, b);
 
-    r[0] = t1[0];
-    for (i=1,j=0; i<439; i++,j++)
-        r[i] = t1[i] + t3[j];
-    for (i=220,j=0; i<439; i++,j++)
-        r[i] += t2[j] - t1[j] - t3[j];
-    for (i=0; j<220*2-1; i++,j++)
-        r[i] += t2[j] - t1[j] - t3[j];
+    k = 439-220;
+    r[0] = t1[0] + t2[k] - t1[k] - t3[k];
+    for (i=1,j=0,k++; i<220; i++,j++,k++)
+        r[i] = t1[i] + t3[j] + t2[k] - t1[k] - t3[k];
+    for (k=0; i<439; i++,j++,k++)
+        r[i] = t1[i] + t3[j] + t2[k] - t1[k] - t3[k];
 
     for (i=0; i<439; i++)
     {
