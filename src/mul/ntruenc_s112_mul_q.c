@@ -89,7 +89,7 @@ static void ntruenc_s112_mul_mod_q_201(short *r, short *a, short *b)
     r[101*2-1] = (t2[101-1] - t1[101-1] - t3[101-1]);
     for (i=0; i<101-1; i++)
         r[i+2*101] = (t2[i+101] - t1[i+101] - t3[i+101] + t3[i]);
-    for (; i<101*2-2; i++)
+    for (; i<101*2-3; i++)
         r[i+2*101] = t3[i];
 }
 

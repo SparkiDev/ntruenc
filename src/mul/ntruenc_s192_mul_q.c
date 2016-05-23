@@ -89,7 +89,7 @@ static void ntruenc_s192_mul_mod_q_149(short *r, short *a, short *b)
     r[75*2-1] = (t2[75-1] - t1[75-1] - t3[75-1]);
     for (i=0; i<75-1; i++)
         r[i+2*75] = (t2[i+75] - t1[i+75] - t3[i+75] + t3[i]);
-    for (; i<75*2-2; i++)
+    for (; i<75*2-3; i++)
         r[i+2*75] = t3[i];
 }
 
@@ -135,7 +135,7 @@ static void ntruenc_s192_mul_mod_q_297(short *r, short *a, short *b)
     r[149*2-1] = (t2[149-1] - t1[149-1] - t3[149-1]);
     for (i=0; i<149-1; i++)
         r[i+2*149] = (t2[i+149] - t1[i+149] - t3[i+149] + t3[i]);
-    for (; i<149*2-2; i++)
+    for (; i<149*2-3; i++)
         r[i+2*149] = t3[i];
 }
 
