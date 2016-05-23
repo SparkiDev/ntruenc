@@ -31,23 +31,43 @@ NTRUENC_METHS ntruenc_meths[] =
 {
     /* Security strength 112 in C. */
     { 112, 0,
-      1, 1, 2,
+#ifdef NTRUENC_SMALL_CODE
+      9, 9, 10,
+#else
+      24, 23, 25,
+#endif
       ntruenc_s112_encrypt, ntruenc_s112_decrypt, ntruenc_s112_keygen },
     /* Security strength 128 in C. */
     { 128, 0,
-      1, 1, 2,
+#ifdef NTRUENC_SMALL_CODE
+      9, 9, 10,
+#else
+      24, 23, 25,
+#endif
       ntruenc_s128_encrypt, ntruenc_s128_decrypt, ntruenc_s128_keygen },
     /* Security strength 192 in C. */
     { 192, 0,
-      1, 1, 2,
+#ifdef NTRUENC_SMALL_CODE
+      9, 9, 10,
+#else
+      24, 23, 25,
+#endif
       ntruenc_s192_encrypt, ntruenc_s192_decrypt, ntruenc_s192_keygen },
     /* Security strength 215 in C. */
     { 215, 0,
-      1, 1, 2,
+#ifdef NTRUENC_SMALL_CODE
+      9, 9, 10,
+#else
+      24, 23, 25,
+#endif
       ntruenc_s215_encrypt, ntruenc_s215_decrypt, ntruenc_s215_keygen },
     /* Security strength 256 in C. */
     { 256, 0,
-      1, 1, 2,
+#ifdef NTRUENC_SMALL_CODE
+      9, 9, 10,
+#else
+      25, 24, 26,
+#endif
       ntruenc_s256_encrypt, ntruenc_s256_decrypt, ntruenc_s256_keygen },
 };
 /**

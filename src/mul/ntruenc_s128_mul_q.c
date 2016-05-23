@@ -31,147 +31,59 @@
  * @param [in] r  The multiplication result.
  * @param [in] a  The first operand.
  * @param [in] b  The second operand.
+ * @param [in] t  Dynamicly allocated data used during life of function.
  */
-static void ntruenc_s128_mul_mod_q_small(int32_t *r, int32_t *a, int32_t *b)
+static void ntruenc_s128_mul_mod_q_small(int64_t *r, int16_t *a, int16_t *b,
+    void *t)
 {
     int i, j;
     int64_t *p;
-    int64_t t[8*2];
 
-    for (j=0; j<8; j++)
-        t[j] = (int64_t)a[0] * b[j];
-    for (i=1; i<8; i++)
+    for (j=0; j<31; j++)
+        r[j] = (int32_t)a[0] * b[j];
+    for (i=1; i<31; i++)
     {
-        t[i+8-1] = 0;
-        p = &t[i];
-        for (j=0; j<8; j++)
-            p[j] += (int64_t)a[i] * b[j];
+        r[i+31-1] = 0;
+        p = &r[i];
+        for (j=0; j<31; j++)
+            p[j] += (int32_t)a[i] * b[j];
     }
-    for (i=0; i<8*2-1; i++)
-        r[i] = t[i] % (NTRU_S128_Q);
 }
 
 /**
  * Karatsuba multiplication of two NTRU vectors.
  *
- * @param [in] r  The multiplication result.
- * @param [in] a  The first operand.
- * @param [in] b  The second operand.
+ * @param [in] r   The multiplication result.
+ * @param [in] a   The first operand.
+ * @param [in] b   The second operand.
+ * @param [in] tp  Dynamicly allocated data used during life of function.
  */
-static void ntruenc_s128_mul_mod_q_16(int32_t *r, int32_t *a, int32_t *b)
+static void ntruenc_s128_mul_mod_q_62(int64_t *r, int16_t *a, int16_t *b,
+    void *tp)
 {
     int i;
-    int32_t t1[2*8-1];
-    int32_t t2[2*8-1];
-    int32_t t3[2*8-1];
-    int32_t aa[8];
-    int32_t bb[8];
-
-    for (i=0; i<8; i++)
-    {
-        aa[i] = a[i+8];
-        bb[i] = b[i+8];
-    }
-    ntruenc_s128_mul_mod_q_small(t3, aa, bb);
-
-    for (i=0; i<8; i++)
-    {
-        aa[i] = aa[i] + a[i];
-        bb[i] = bb[i] + b[i];
-    }
-    ntruenc_s128_mul_mod_q_small(t2, aa, bb);
-
-    ntruenc_s128_mul_mod_q_small(t1, a, b);
-
-    for (i=0; i<8; i++)
-        r[i] = t1[i];
-    for (i=0; i<8-1; i++)
-        r[i+8] = (t1[i+8] + t2[i] - t1[i] - t3[i]);
-    r[8*2-1] = (t2[8-1] - t1[8-1] - t3[8-1]);
-    for (i=0; i<8-1; i++)
-        r[i+2*8] = (t2[i+8] - t1[i+8] - t3[i+8] + t3[i]);
-    for (; i<8*2-1; i++)
-        r[i+2*8] = t3[i];
-}
-
-/**
- * Karatsuba multiplication of two NTRU vectors.
- *
- * @param [in] r  The multiplication result.
- * @param [in] a  The first operand.
- * @param [in] b  The second operand.
- */
-static void ntruenc_s128_mul_mod_q_31(int32_t *r, int32_t *a, int32_t *b)
-{
-    int i;
-    int32_t t1[2*16-1];
-    int32_t t2[2*16-1];
-    int32_t t3[2*16-1];
-    int32_t aa[16];
-    int32_t bb[16];
-
-    for (i=0; i<15; i++)
-    {
-        aa[i] = a[i+16];
-        bb[i] = b[i+16];
-    }
-    aa[15] = 0;
-    bb[15] = 0;
-
-    ntruenc_s128_mul_mod_q_16(t3, aa, bb);
-
-    for (i=0; i<16; i++)
-    {
-        aa[i] = aa[i] + a[i];
-        bb[i] = bb[i] + b[i];
-    }
-    ntruenc_s128_mul_mod_q_16(t2, aa, bb);
-
-    ntruenc_s128_mul_mod_q_16(t1, a, b);
-
-    t3[16*2-2] = 0;
-    for (i=0; i<16; i++)
-        r[i] = t1[i];
-    for (i=0; i<16-1; i++)
-        r[i+16] = (t1[i+16] + t2[i] - t1[i] - t3[i]);
-    r[16*2-1] = (t2[16-1] - t1[16-1] - t3[16-1]);
-    for (i=0; i<16-1; i++)
-        r[i+2*16] = (t2[i+16] - t1[i+16] - t3[i+16] + t3[i]);
-    for (; i<16*2-1; i++)
-        r[i+2*16] = t3[i];
-}
-
-/**
- * Karatsuba multiplication of two NTRU vectors.
- *
- * @param [in] r  The multiplication result.
- * @param [in] a  The first operand.
- * @param [in] b  The second operand.
- */
-static void ntruenc_s128_mul_mod_q_62(int32_t *r, int32_t *a, int32_t *b)
-{
-    int i;
-    int32_t t1[2*31-1];
-    int32_t t2[2*31-1];
-    int32_t t3[2*31-1];
-    int32_t aa[31];
-    int32_t bb[31];
+    int64_t *t1 = tp;
+    int64_t *t2 = t1 + (2*31+1);
+    int64_t *t3 = t2 + (2*31+1);
+    int64_t *t = t3 + (2*31+1);
+    int16_t aa[31];
+    int16_t bb[31];
 
     for (i=0; i<31; i++)
     {
         aa[i] = a[i+31];
         bb[i] = b[i+31];
     }
-    ntruenc_s128_mul_mod_q_31(t3, aa, bb);
+    ntruenc_s128_mul_mod_q_small(t3, aa, bb, t);
 
     for (i=0; i<31; i++)
     {
-        aa[i] = aa[i] + a[i];
-        bb[i] = bb[i] + b[i];
+        aa[i] = (aa[i] + a[i]) % NTRU_S128_Q;
+        bb[i] = (bb[i] + b[i]) % NTRU_S128_Q;
     }
-    ntruenc_s128_mul_mod_q_31(t2, aa, bb);
+    ntruenc_s128_mul_mod_q_small(t2, aa, bb, t);
 
-    ntruenc_s128_mul_mod_q_31(t1, a, b);
+    ntruenc_s128_mul_mod_q_small(t1, a, b, t);
 
     for (i=0; i<31; i++)
         r[i] = t1[i];
@@ -187,18 +99,21 @@ static void ntruenc_s128_mul_mod_q_62(int32_t *r, int32_t *a, int32_t *b)
 /**
  * Karatsuba multiplication of two NTRU vectors.
  *
- * @param [in] r  The multiplication result.
- * @param [in] a  The first operand.
- * @param [in] b  The second operand.
+ * @param [in] r   The multiplication result.
+ * @param [in] a   The first operand.
+ * @param [in] b   The second operand.
+ * @param [in] tp  Dynamicly allocated data used during life of function.
  */
-static void ntruenc_s128_mul_mod_q_123(int32_t *r, int32_t *a, int32_t *b)
+static void ntruenc_s128_mul_mod_q_123(int64_t *r, int16_t *a, int16_t *b,
+    void *tp)
 {
     int i;
-    int32_t t1[2*62-1];
-    int32_t t2[2*62-1];
-    int32_t t3[2*62-1];
-    int32_t aa[62];
-    int32_t bb[62];
+    int64_t *t1 = tp;
+    int64_t *t2 = t1 + (2*62+1);
+    int64_t *t3 = t2 + (2*62+1);
+    int64_t *t = t3 + (2*62+1);
+    int16_t aa[62];
+    int16_t bb[62];
 
     for (i=0; i<61; i++)
     {
@@ -208,16 +123,16 @@ static void ntruenc_s128_mul_mod_q_123(int32_t *r, int32_t *a, int32_t *b)
     aa[61] = 0;
     bb[61] = 0;
 
-    ntruenc_s128_mul_mod_q_62(t3, aa, bb);
+    ntruenc_s128_mul_mod_q_62(t3, aa, bb, t);
 
     for (i=0; i<62; i++)
     {
-        aa[i] = aa[i] + a[i];
-        bb[i] = bb[i] + b[i];
+        aa[i] = (aa[i] + a[i]);
+        bb[i] = (bb[i] + b[i]);
     }
-    ntruenc_s128_mul_mod_q_62(t2, aa, bb);
+    ntruenc_s128_mul_mod_q_62(t2, aa, bb, t);
 
-    ntruenc_s128_mul_mod_q_62(t1, a, b);
+    ntruenc_s128_mul_mod_q_62(t1, a, b, t);
 
     t3[62*2-2] = 0;
     for (i=0; i<62; i++)
@@ -234,34 +149,37 @@ static void ntruenc_s128_mul_mod_q_123(int32_t *r, int32_t *a, int32_t *b)
 /**
  * Karatsuba multiplication of two NTRU vectors.
  *
- * @param [in] r  The multiplication result.
- * @param [in] a  The first operand.
- * @param [in] b  The second operand.
+ * @param [in] r   The multiplication result.
+ * @param [in] a   The first operand.
+ * @param [in] b   The second operand.
+ * @param [in] tp  Dynamicly allocated data used during life of function.
  */
-static void ntruenc_s128_mul_mod_q_246(int32_t *r, int32_t *a, int32_t *b)
+static void ntruenc_s128_mul_mod_q_246(int64_t *r, int16_t *a, int16_t *b,
+    void *tp)
 {
     int i;
-    int32_t t1[2*123-1];
-    int32_t t2[2*123-1];
-    int32_t t3[2*123-1];
-    int32_t aa[123];
-    int32_t bb[123];
+    int64_t *t1 = tp;
+    int64_t *t2 = t1 + (2*123+1);
+    int64_t *t3 = t2 + (2*123+1);
+    int64_t *t = t3 + (2*123+1);
+    int16_t aa[123];
+    int16_t bb[123];
 
     for (i=0; i<123; i++)
     {
         aa[i] = a[i+123];
         bb[i] = b[i+123];
     }
-    ntruenc_s128_mul_mod_q_123(t3, aa, bb);
+    ntruenc_s128_mul_mod_q_123(t3, aa, bb, t);
 
     for (i=0; i<123; i++)
     {
-        aa[i] = aa[i] + a[i];
-        bb[i] = bb[i] + b[i];
+        aa[i] = (aa[i] + a[i]) % NTRU_S128_Q;
+        bb[i] = (bb[i] + b[i]) % NTRU_S128_Q;
     }
-    ntruenc_s128_mul_mod_q_123(t2, aa, bb);
+    ntruenc_s128_mul_mod_q_123(t2, aa, bb, t);
 
-    ntruenc_s128_mul_mod_q_123(t1, a, b);
+    ntruenc_s128_mul_mod_q_123(t1, a, b, t);
 
     for (i=0; i<123; i++)
         r[i] = t1[i];
@@ -277,18 +195,21 @@ static void ntruenc_s128_mul_mod_q_246(int32_t *r, int32_t *a, int32_t *b)
 /**
  * Karatsuba multiplication of two NTRU vectors.
  *
- * @param [in] r  The multiplication result.
- * @param [in] a  The first operand.
- * @param [in] b  The second operand.
+ * @param [in] r   The multiplication result.
+ * @param [in] a   The first operand.
+ * @param [in] b   The second operand.
+ * @param [in] tp  Dynamicly allocated data used during life of function.
  */
-void ntruenc_s128_mul_mod_q(short *r, short *a, short *b)
+void ntruenc_s128_mul_mod_q(short *r, short *a, short *b,
+    void *tp)
 {
-    int i, j;
-    int32_t t1[2*246-1];
-    int32_t t2[2*246-1];
-    int32_t t3[2*246-1];
-    int32_t aa[246];
-    int32_t bb[246];
+    int i, j, k;
+    int64_t *t1 = tp;
+    int64_t *t2 = t1 + (2*246+1);
+    int64_t *t3 = t2 + (2*246+1);
+    int64_t *t = t3 + (2*246+1);
+    int16_t aa[246];
+    int16_t bb[246];
 
     for (i=0; i<245; i++)
     {
@@ -298,29 +219,23 @@ void ntruenc_s128_mul_mod_q(short *r, short *a, short *b)
     aa[245] = 0;
     bb[245] = 0;
 
-    ntruenc_s128_mul_mod_q_246(t3, aa, bb);
+    ntruenc_s128_mul_mod_q_246(t3, aa, bb, t);
 
     for (i=0; i<246; i++)
     {
-        aa[i] = aa[i] + a[i];
-        bb[i] = bb[i] + b[i];
+        aa[i] = (aa[i] + a[i]);
+        bb[i] = (bb[i] + b[i]);
     }
-    ntruenc_s128_mul_mod_q_246(t2, aa, bb);
+    ntruenc_s128_mul_mod_q_246(t2, aa, bb, t);
 
-    for (i=0; i<245; i++)
-    {
-        aa[i] = a[i];
-        bb[i] = b[i];
-    }
-    ntruenc_s128_mul_mod_q_246(t1, aa, bb);
+    ntruenc_s128_mul_mod_q_246(t1, a, b, t);
 
-    r[0] = t1[0];
-    for (i=1,j=0; i<491; i++,j++)
-        r[i] = (t1[i] + t3[j]) % NTRU_S128_Q;
-    for (i=246,j=0; i<491; i++,j++)
-        r[i] = (r[i] + t2[j] - t1[j] - t3[j]) % NTRU_S128_Q;
-    for (i=0; j<246*2-1; i++,j++)
-        r[i] = (r[i] + t2[j] - t1[j] - t3[j]) % NTRU_S128_Q;
+    k = 491-246;
+    r[0] = (t1[0] + t2[k] - t1[k] - t3[k]) % NTRU_S128_Q;
+    for (i=1,j=0,k++; i<246; i++,j++,k++)
+        r[i] = (t1[i] + t3[j] + t2[k] - t1[k] - t3[k]) % NTRU_S128_Q;
+    for (k=0; i<491; i++,j++,k++)
+        r[i] = (t1[i] + t3[j] + t2[k] - t1[k] - t3[k]) % NTRU_S128_Q;
 
     for (i=0; i<491; i++)
     {

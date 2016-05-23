@@ -48,11 +48,11 @@ static short *neg_mod_3 = &neg_mod_3_data[2];
  * @param [in] a  The first operand.
  * @param [in] b  The second operand.
  */
-void NTRUENC_MUL_MOD_Q(short *r, short *a, short *b)
+void NTRUENC_MUL_MOD_Q(short *r, short *a, short *b, void *tp)
 {
     int i, j;
     int64_t *p;
-    int64_t t[NTRU_N*2];
+    int64_t *t = tp;
 
     for (j=0; j<NTRU_N; j++)
         t[j] = (int32_t)a[0] * b[j];
@@ -110,7 +110,7 @@ int NTRUENC_KEYGEN(short *f, short *h, short *t)
     ret = NTRUENC_RANDOM(g, NTRU_DG, NTRU_DG, 3);
     if (ret != 0) return ret;
 
-    NTRUENC_MUL_MOD_Q(h, t, g);
+    NTRUENC_MUL_MOD_Q(h, t, g, t+NTRU_N*2);
 
     return 0;
 }
@@ -133,7 +133,7 @@ int NTRUENC_ENCRYPT(short *e, short *m, short *h, short *t)
     ret = NTRUENC_RANDOM(t, NTRU_DF, NTRU_DF, 1);
     if (ret != 0) return ret;
 
-    NTRUENC_MUL_MOD_Q(e, t, h);
+    NTRUENC_MUL_MOD_Q(e, t, h, t+NTRU_N);
     /* Add in message/key and ensure the values are in the right range. */
     for (i=0; i<NTRU_N; i++)
     {
@@ -159,7 +159,7 @@ void NTRUENC_DECRYPT(short *c, short *e, short *f, short *t)
 {
     int i;
 
-    NTRUENC_MUL_MOD_Q(c, f, e);
+    NTRUENC_MUL_MOD_Q(c, f, e, t);
     /* Calculate mod p to isolate the message/key. */
     for (i=0; i<NTRU_N; i++)
         c[i] = ntruenc_neg_mod_3(c[i]);

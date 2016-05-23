@@ -92,9 +92,8 @@ int ntruenc_s112_random(short *a, int df1, int df2, short v);
 int ntruenc_s112_keygen(short *f, short *h, short *t);
 int ntruenc_s112_encrypt(short *e, short *m, short *h, short *t);
 void ntruenc_s112_decrypt(short *c, short *e, short *f, short *t);
-int ntruenc_s112_mod_inv_2(short *r, short *a);
 int ntruenc_s112_mod_inv_q(short *r, short *a);
-void ntruenc_s112_mul_mod_q(short *r, short *a, short *b);
+void ntruenc_s112_mul_mod_q(short *r, short *a, short *b, void *t);
 
 
 /**
@@ -119,9 +118,8 @@ int ntruenc_s128_random(short *a, int df1, int df2, short v);
 int ntruenc_s128_keygen(short *f, short *h, short *t);
 int ntruenc_s128_encrypt(short *e, short *m, short *h, short *t);
 void ntruenc_s128_decrypt(short *c, short *e, short *f, short *t);
-int ntruenc_s128_mod_inv_2(short *r, short *a);
 int ntruenc_s128_mod_inv_q(short *r, short *a);
-void ntruenc_s128_mul_mod_q(short *r, short *a, short *b);
+void ntruenc_s128_mul_mod_q(short *r, short *a, short *b, void *t);
 
 /**
  * The number of -1 elements in a random NTRU vector mod p for a security
@@ -145,9 +143,8 @@ int ntruenc_s192_random(short *a, int df1, int df2, short v);
 int ntruenc_s192_keygen(short *f, short *h, short *t);
 int ntruenc_s192_encrypt(short *e, short *m, short *h, short *t);
 void ntruenc_s192_decrypt(short *c, short *e, short *f, short *t);
-int ntruenc_s192_mod_inv_2(short *r, short *a);
 int ntruenc_s192_mod_inv_q(short *r, short *a);
-void ntruenc_s192_mul_mod_q(short *r, short *a, short *b);
+void ntruenc_s192_mul_mod_q(short *r, short *a, short *b, void *t);
 
 /**
  * The number of -1 elements in a random NTRU vector mod p for a security
@@ -171,9 +168,8 @@ int ntruenc_s215_random(short *a, int df1, int df2, short v);
 int ntruenc_s215_keygen(short *f, short *h, short *t);
 int ntruenc_s215_encrypt(short *e, short *m, short *h, short *t);
 void ntruenc_s215_decrypt(short *c, short *e, short *f, short *t);
-int ntruenc_s215_mod_inv_2(short *r, short *a);
 int ntruenc_s215_mod_inv_q(short *r, short *a);
-void ntruenc_s215_mul_mod_q(short *r, short *a, short *b);
+void ntruenc_s215_mul_mod_q(short *r, short *a, short *b, void *t);
 
 /**
  * The number of -1 elements in a random NTRU vector mod p for a security
@@ -197,7 +193,6 @@ int ntruenc_s256_random(short *a, int df1, int df2, short v);
 int ntruenc_s256_keygen(short *f, short *h, short *t);
 int ntruenc_s256_encrypt(short *e, short *m, short *h, short *t);
 void ntruenc_s256_decrypt(short *c, short *e, short *f, short *t);
-int ntruenc_s256_mod_inv_2(short *r, short *a);
 int ntruenc_s256_mod_inv_q(short *r, short *a);
-void ntruenc_s256_mul_mod_q(short *r, short *a, short *b);
+void ntruenc_s256_mul_mod_q(short *r, short *a, short *b, void *t);
 
