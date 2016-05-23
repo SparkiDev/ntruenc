@@ -63,9 +63,9 @@ static void ntruenc_s215_mul_mod_q_93(int64_t *r, int16_t *a, int16_t *b,
 {
     int i;
     int64_t *t1 = tp;
-    int64_t *t2 = t1 + (2*47+1);
-    int64_t *t3 = t2 + (2*47+1);
-    int64_t *t = t3 + (2*47+1);
+    int64_t *t2 = t1 + 2*47-1;
+    int64_t *t3 = t2 + 2*47-1;
+    int64_t *t = t3 + 2*47-1;
     int16_t aa[47];
     int16_t bb[47];
 
@@ -95,7 +95,7 @@ static void ntruenc_s215_mul_mod_q_93(int64_t *r, int16_t *a, int16_t *b,
     r[47*2-1] = (t2[47-1] - t1[47-1] - t3[47-1]);
     for (i=0; i<47-1; i++)
         r[i+2*47] = (t2[i+47] - t1[i+47] - t3[i+47] + t3[i]);
-    for (; i<47*2-2; i++)
+    for (; i<47*2-3; i++)
         r[i+2*47] = t3[i];
 }
 
@@ -112,9 +112,9 @@ static void ntruenc_s215_mul_mod_q_185(int64_t *r, int16_t *a, int16_t *b,
 {
     int i;
     int64_t *t1 = tp;
-    int64_t *t2 = t1 + (2*93+1);
-    int64_t *t3 = t2 + (2*93+1);
-    int64_t *t = t3 + (2*93+1);
+    int64_t *t2 = t1 + 2*93-1;
+    int64_t *t3 = t2 + 2*93-1;
+    int64_t *t = t3 + 2*93-1;
     int16_t aa[93];
     int16_t bb[93];
 
@@ -144,7 +144,7 @@ static void ntruenc_s215_mul_mod_q_185(int64_t *r, int16_t *a, int16_t *b,
     r[93*2-1] = (t2[93-1] - t1[93-1] - t3[93-1]);
     for (i=0; i<93-1; i++)
         r[i+2*93] = (t2[i+93] - t1[i+93] - t3[i+93] + t3[i]);
-    for (; i<93*2-2; i++)
+    for (; i<93*2-3; i++)
         r[i+2*93] = t3[i];
 }
 
@@ -161,9 +161,9 @@ static void ntruenc_s215_mul_mod_q_370(int64_t *r, int16_t *a, int16_t *b,
 {
     int i;
     int64_t *t1 = tp;
-    int64_t *t2 = t1 + (2*185+1);
-    int64_t *t3 = t2 + (2*185+1);
-    int64_t *t = t3 + (2*185+1);
+    int64_t *t2 = t1 + 2*185-1;
+    int64_t *t3 = t2 + 2*185-1;
+    int64_t *t = t3 + 2*185-1;
     int16_t aa[185];
     int16_t bb[185];
 
@@ -207,9 +207,9 @@ void ntruenc_s215_mul_mod_q(short *r, short *a, short *b,
 {
     int i, j, k;
     int64_t *t1 = tp;
-    int64_t *t2 = t1 + (2*370+1);
-    int64_t *t3 = t2 + (2*370+1);
-    int64_t *t = t3 + (2*370+1);
+    int64_t *t2 = t1 + 2*370-1;
+    int64_t *t3 = t2 + 2*370-1;
+    int64_t *t = t3 + 2*370-1;
     int16_t aa[370];
     int16_t bb[370];
 

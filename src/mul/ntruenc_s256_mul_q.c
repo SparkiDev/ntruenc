@@ -63,9 +63,9 @@ static void ntruenc_s256_mul_mod_q_56(int64_t *r, int16_t *a, int16_t *b,
 {
     int i;
     int64_t *t1 = tp;
-    int64_t *t2 = t1 + (2*28+1);
-    int64_t *t3 = t2 + (2*28+1);
-    int64_t *t = t3 + (2*28+1);
+    int64_t *t2 = t1 + 2*28-1;
+    int64_t *t3 = t2 + 2*28-1;
+    int64_t *t = t3 + 2*28-1;
     int16_t aa[28];
     int16_t bb[28];
 
@@ -109,9 +109,9 @@ static void ntruenc_s256_mul_mod_q_111(int64_t *r, int16_t *a, int16_t *b,
 {
     int i;
     int64_t *t1 = tp;
-    int64_t *t2 = t1 + (2*56+1);
-    int64_t *t3 = t2 + (2*56+1);
-    int64_t *t = t3 + (2*56+1);
+    int64_t *t2 = t1 + 2*56-1;
+    int64_t *t3 = t2 + 2*56-1;
+    int64_t *t = t3 + 2*56-1;
     int16_t aa[56];
     int16_t bb[56];
 
@@ -141,7 +141,7 @@ static void ntruenc_s256_mul_mod_q_111(int64_t *r, int16_t *a, int16_t *b,
     r[56*2-1] = (t2[56-1] - t1[56-1] - t3[56-1]);
     for (i=0; i<56-1; i++)
         r[i+2*56] = (t2[i+56] - t1[i+56] - t3[i+56] + t3[i]);
-    for (; i<56*2-2; i++)
+    for (; i<56*2-3; i++)
         r[i+2*56] = t3[i];
 }
 
@@ -158,9 +158,9 @@ static void ntruenc_s256_mul_mod_q_221(int64_t *r, int16_t *a, int16_t *b,
 {
     int i;
     int64_t *t1 = tp;
-    int64_t *t2 = t1 + (2*111+1);
-    int64_t *t3 = t2 + (2*111+1);
-    int64_t *t = t3 + (2*111+1);
+    int64_t *t2 = t1 + 2*111-1;
+    int64_t *t3 = t2 + 2*111-1;
+    int64_t *t = t3 + 2*111-1;
     int16_t aa[111];
     int16_t bb[111];
 
@@ -190,7 +190,7 @@ static void ntruenc_s256_mul_mod_q_221(int64_t *r, int16_t *a, int16_t *b,
     r[111*2-1] = (t2[111-1] - t1[111-1] - t3[111-1]);
     for (i=0; i<111-1; i++)
         r[i+2*111] = (t2[i+111] - t1[i+111] - t3[i+111] + t3[i]);
-    for (; i<111*2-2; i++)
+    for (; i<111*2-3; i++)
         r[i+2*111] = t3[i];
 }
 
@@ -207,9 +207,9 @@ static void ntruenc_s256_mul_mod_q_441(int64_t *r, int16_t *a, int16_t *b,
 {
     int i;
     int64_t *t1 = tp;
-    int64_t *t2 = t1 + (2*221+1);
-    int64_t *t3 = t2 + (2*221+1);
-    int64_t *t = t3 + (2*221+1);
+    int64_t *t2 = t1 + 2*221-1;
+    int64_t *t3 = t2 + 2*221-1;
+    int64_t *t = t3 + 2*221-1;
     int16_t aa[221];
     int16_t bb[221];
 
@@ -239,7 +239,7 @@ static void ntruenc_s256_mul_mod_q_441(int64_t *r, int16_t *a, int16_t *b,
     r[221*2-1] = (t2[221-1] - t1[221-1] - t3[221-1]);
     for (i=0; i<221-1; i++)
         r[i+2*221] = (t2[i+221] - t1[i+221] - t3[i+221] + t3[i]);
-    for (; i<221*2-2; i++)
+    for (; i<221*2-3; i++)
         r[i+2*221] = t3[i];
 }
 
@@ -256,9 +256,9 @@ void ntruenc_s256_mul_mod_q(short *r, short *a, short *b,
 {
     int i, j, k;
     int64_t *t1 = tp;
-    int64_t *t2 = t1 + (2*441+1);
-    int64_t *t3 = t2 + (2*441+1);
-    int64_t *t = t3 + (2*441+1);
+    int64_t *t2 = t1 + 2*441-1;
+    int64_t *t3 = t2 + 2*441-1;
+    int64_t *t = t3 + 2*441-1;
     int16_t aa[441];
     int16_t bb[441];
 

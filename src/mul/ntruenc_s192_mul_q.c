@@ -63,9 +63,9 @@ static void ntruenc_s192_mul_mod_q_83(int64_t *r, int16_t *a, int16_t *b,
 {
     int i;
     int64_t *t1 = tp;
-    int64_t *t2 = t1 + (2*42+1);
-    int64_t *t3 = t2 + (2*42+1);
-    int64_t *t = t3 + (2*42+1);
+    int64_t *t2 = t1 + 2*42-1;
+    int64_t *t3 = t2 + 2*42-1;
+    int64_t *t = t3 + 2*42-1;
     int16_t aa[42];
     int16_t bb[42];
 
@@ -95,7 +95,7 @@ static void ntruenc_s192_mul_mod_q_83(int64_t *r, int16_t *a, int16_t *b,
     r[42*2-1] = (t2[42-1] - t1[42-1] - t3[42-1]);
     for (i=0; i<42-1; i++)
         r[i+2*42] = (t2[i+42] - t1[i+42] - t3[i+42] + t3[i]);
-    for (; i<42*2-2; i++)
+    for (; i<42*2-3; i++)
         r[i+2*42] = t3[i];
 }
 
@@ -112,9 +112,9 @@ static void ntruenc_s192_mul_mod_q_165(int64_t *r, int16_t *a, int16_t *b,
 {
     int i;
     int64_t *t1 = tp;
-    int64_t *t2 = t1 + (2*83+1);
-    int64_t *t3 = t2 + (2*83+1);
-    int64_t *t = t3 + (2*83+1);
+    int64_t *t2 = t1 + 2*83-1;
+    int64_t *t3 = t2 + 2*83-1;
+    int64_t *t = t3 + 2*83-1;
     int16_t aa[83];
     int16_t bb[83];
 
@@ -144,7 +144,7 @@ static void ntruenc_s192_mul_mod_q_165(int64_t *r, int16_t *a, int16_t *b,
     r[83*2-1] = (t2[83-1] - t1[83-1] - t3[83-1]);
     for (i=0; i<83-1; i++)
         r[i+2*83] = (t2[i+83] - t1[i+83] - t3[i+83] + t3[i]);
-    for (; i<83*2-2; i++)
+    for (; i<83*2-3; i++)
         r[i+2*83] = t3[i];
 }
 
@@ -161,9 +161,9 @@ static void ntruenc_s192_mul_mod_q_330(int64_t *r, int16_t *a, int16_t *b,
 {
     int i;
     int64_t *t1 = tp;
-    int64_t *t2 = t1 + (2*165+1);
-    int64_t *t3 = t2 + (2*165+1);
-    int64_t *t = t3 + (2*165+1);
+    int64_t *t2 = t1 + 2*165-1;
+    int64_t *t3 = t2 + 2*165-1;
+    int64_t *t = t3 + 2*165-1;
     int16_t aa[165];
     int16_t bb[165];
 
@@ -207,9 +207,9 @@ void ntruenc_s192_mul_mod_q(short *r, short *a, short *b,
 {
     int i, j, k;
     int64_t *t1 = tp;
-    int64_t *t2 = t1 + (2*330+1);
-    int64_t *t3 = t2 + (2*330+1);
-    int64_t *t = t3 + (2*330+1);
+    int64_t *t2 = t1 + 2*330-1;
+    int64_t *t3 = t2 + 2*330-1;
+    int64_t *t = t3 + 2*330-1;
     int16_t aa[330];
     int16_t bb[330];
 
