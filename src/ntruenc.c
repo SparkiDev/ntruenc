@@ -702,8 +702,8 @@ int NTRUENC_keygen(NTRUENC *ne, NTRUENC_PRIV_KEY **priv_key,
     priv = NULL;
     pub = NULL;
 end:
-    NTRUENC_PUB_KEY_free(pub);
-    NTRUENC_PRIV_KEY_free(priv);
+    if (*pub_key != pub) NTRUENC_PUB_KEY_free(pub);
+    if (*priv_key != priv) NTRUENC_PRIV_KEY_free(priv);
     return ret;
 }
 
