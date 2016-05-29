@@ -87,7 +87,7 @@ typedef struct ntruenc_mod_inv_st
 
 int ntruenc_s#{str}_mod_inv_q(short *r, short *a)
 {
-    int16_t i, j, k, d;
+    int16_t i, j, d;
     NTRUENC_MOD_INV mi[2];
     NTRUENC_MOD_INV *m0 = &mi[0];
     NTRUENC_MOD_INV *m1 = &mi[1];
@@ -118,7 +118,7 @@ int ntruenc_s#{str}_mod_inv_q(short *r, short *a)
     m1->f[NTRU_S#{str}_N] = 1;
     m1->fs = 0;
 
-    for (k=0; k<NTRU_S#{str}_N*2-1; k++)
+    for (j=0; j<NTRU_S#{str}_N*2; j++)
     {
         /* Find first non-zero element. */
         for (d=0,i=0; i<=NTRU_S#{str}_N; i++)
@@ -130,9 +130,10 @@ int ntruenc_s#{str}_mod_inv_q(short *r, short *a)
         /* Prepend other b a number of zeros. */
         m1->b -= d;
 
-        /* Make current index be the longer of the two - start is smaller. */
-        m0 = &mi[mi[0].fs > mi[1].fs];
-        m1 = &mi[mi[0].fs <= mi[1].fs];
+        /* Make first vector be the longer of the two - start is smaller. */
+        i = mi[0].fs > mi[1].fs;
+        m0 = &mi[i];
+        m1 = &mi[1-i];
 
         imq = (ntruenc_inv[m1->f[m1->fs]] * (NTRU_S#{str}_Q - m0->f[m0->fs] +
             (m0->fs == NTRU_S#{str}_N))) % NTRU_S#{str}_Q;
@@ -149,10 +150,9 @@ int ntruenc_s#{str}_mod_inv_q(short *r, short *a)
     /* Move the values in but wrt the fact that there are NTRU_S#{str}_N+1
      * values.
      */
-    r[0] = m0->b[NTRU_S#{str}_N-1];
-    r[1] = (m0->b[0] + m0->b[NTRU_S#{str}_N]) % NTRU_S#{str}_Q;
-    for (i=1,j=2; i<k; i++,j++)
-        r[j] = m0->b[i];
+    r[0] = (m0->b[0] + m0->b[NTRU_S#{str}_N]) % NTRU_S#{str}_Q;
+    for (i=1; i<NTRU_S#{str}_N; i++)
+        r[i] = m0->b[i];
 
     return NTRU_ERR_NO_INVERSE & (0 - (m0->f[m0->fs] != 1));
 }
