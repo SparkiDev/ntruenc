@@ -38,7 +38,6 @@ File.readlines(File.dirname(__FILE__)+'/../../rubyasm/license.c').each { |l| put
 puts <<EOF
 #include <string.h>
 #include <stdint.h>
-#include <stdio.h>
 #include "ntruenc_lcl.h"
 
 static uint32_t ntruenc_inv[] = {

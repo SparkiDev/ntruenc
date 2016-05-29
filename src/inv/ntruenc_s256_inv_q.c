@@ -22,7 +22,6 @@
 
 #include <string.h>
 #include <stdint.h>
-#include <stdio.h>
 #include "ntruenc_lcl.h"
 
 static uint32_t ntruenc_inv[] = {
