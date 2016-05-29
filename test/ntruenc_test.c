@@ -167,15 +167,15 @@ void keygen_cycles(NTRUENC *ne, NTRUENC_PARAMS *params,
 
     NTRUENC_keygen_init(ne, params);
     /* Prime the caches, etc */
-    for (i=0; i<50; i++)
+    for (i=0; i<20; i++)
         NTRUENC_keygen(ne, &priv_key, &pub_key);
 
     /* Approximate number of ops in a second. */
     start = get_cycles();
-    for (i=0; i<50; i++)
+    for (i=0; i<20; i++)
         NTRUENC_keygen(ne, &priv_key, &pub_key);
     end = get_cycles();
-    num_ops = cps/((end-start)/50);
+    num_ops = cps/((end-start)/20);
 
     /* Perform about 1 seconds worth of operations. */
     start = get_cycles();
