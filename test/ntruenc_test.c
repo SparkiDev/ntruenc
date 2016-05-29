@@ -90,7 +90,7 @@ void enc_cycles(NTRUENC *ne, unsigned char *data, int len,
 
     diff = end - start;
 
-    printf("enc: %7d %2.3f  %7"PRIu64" %6"PRIu64"\n", num_ops, diff/(cps*1.0),
+    printf("enc: %7d %2.3f  %8"PRIu64" %6"PRIu64"\n", num_ops, diff/(cps*1.0),
         diff/num_ops, cps/(diff/num_ops));
 
     NTRUENC_encrypt_final(ne);
@@ -143,7 +143,7 @@ void dec_cycles(NTRUENC *ne, unsigned char *enc, int elen,
 
     diff = end - start;
 
-    printf("dec: %7d %2.3f  %7"PRIu64" %6"PRIu64"\n", num_ops, diff/(cps*1.0),
+    printf("dec: %7d %2.3f  %8"PRIu64" %6"PRIu64"\n", num_ops, diff/(cps*1.0),
         diff/num_ops, cps/(diff/num_ops));
 
     NTRUENC_decrypt_final(ne);
@@ -185,7 +185,7 @@ void keygen_cycles(NTRUENC *ne, NTRUENC_PARAMS *params,
 
     diff = end - start;
 
-    printf("kgn: %7d %2.3f  %7"PRIu64" %6"PRIu64"\n", num_ops, diff/(cps*1.0),
+    printf("kgn: %7d %2.3f  %8"PRIu64" %6"PRIu64"\n", num_ops, diff/(cps*1.0),
         diff/num_ops, cps/(diff/num_ops));
 
     NTRUENC_keygen_final(ne);
@@ -336,7 +336,7 @@ int test_ntruenc(int strength, int flags, int speed)
     if (speed)
     {
         printf("\n");
-        printf(" Op  %7s %5s  %7s %6s\n", "ops", "secs", "c/op", "ops/s");
+        printf(" Op  %7s %5s  %8s %6s\n", "ops", "secs", "c/op", "ops/s");
         enc_cycles(ne, data, len, pub_key);
         dec_cycles(ne, enc, elen, priv_key);
         keygen_cycles(ne, params, priv_key, pub_key);
