@@ -72,14 +72,14 @@ puts <<EOF
 typedef struct ntruenc_mod_inv_st
 {
     /* The data for the inverse value. */
-    int16_t bd[2*NTRU_S#{str}_N+1];
+    int32_t bd[2*NTRU_S#{str}_N+1];
     /* The pointer to the start of the inverse value data. */
-    int16_t *b;
+    int32_t *b;
 
     /* The data for the f value. */
-    int16_t fd[2*NTRU_S#{str}_N+1];
+    int32_t fd[2*NTRU_S#{str}_N+1];
     /* The pointer to start of the f value data. */
-    int16_t *f;
+    int32_t *f;
     /* The index of the start of the f value. */
     int16_t fs;
 } NTRUENC_MOD_INV;
