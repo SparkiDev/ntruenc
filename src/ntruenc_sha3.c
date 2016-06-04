@@ -49,10 +49,22 @@ static uint64_t ntru_keccak_le64(const uint8_t *x)
     return r;
 }
 
-/** An array of masking values for block operation. */
-static uint64_t ntru_keccak_r[24] = 
+/** An array of values to XOR for block operation. */
+static uint64_t ntru_keccak_r[24] =
 {
-0x0000000000000001, 0x0000000000008082, 0x800000000000808a, 0x8000000080008000, 0x000000000000808b, 0x0000000080000001, 0x8000000080008081, 0x8000000000008009, 0x000000000000008a, 0x0000000000000088, 0x0000000080008009, 0x000000008000000a, 0x000000008000808b, 0x800000000000008b, 0x8000000000008089, 0x8000000000008003, 0x8000000000008002, 0x8000000000000080, 0x000000000000800a, 0x800000008000000a, 0x8000000080008081, 0x8000000000008080, 0x0000000080000001, 0x8000000080008008, };
+    0x0000000000000001UL, 0x0000000000008082UL,
+    0x800000000000808aUL, 0x8000000080008000UL,
+    0x000000000000808bUL, 0x0000000080000001UL,
+    0x8000000080008081UL, 0x8000000000008009UL,
+    0x000000000000008aUL, 0x0000000000000088UL,
+    0x0000000080008009UL, 0x000000008000000aUL,
+    0x000000008000808bUL, 0x800000000000008bUL,
+    0x8000000000008089UL, 0x8000000000008003UL,
+    0x8000000000008002UL, 0x8000000000000080UL,
+    0x000000000000800aUL, 0x800000008000000aUL,
+    0x8000000080008081UL, 0x8000000000008080UL,
+    0x0000000080000001UL, 0x8000000080008008UL
+};
 
 #define K_I_0	10
 #define K_I_1	 7
@@ -105,19 +117,94 @@ static uint64_t ntru_keccak_r[24] =
 #define K_R_23	44
 
 /**
- * Loop operation.
+ * Swap operation.
  *
  * @param [in] s   The state.
- * @param [in] t   Temporary value.
+ * @param [in] t1  Temporary value.
  * @param [in] t2  Second temporary value.
- * @param [in] j   The index of the loop.
+ * @param [in] i   The index of the loop.
  */
-#define L(s, t, t2, j)						\
-do								\
-{								\
-    t2 = s[K_I_##j]; s[K_I_##j] = ROL(t, K_R_##j); t = t2;	\
-}								\
+#define SWAP(s, t1, t2, i)                                              \
+do                                                                      \
+{                                                                       \
+    t2 = s[K_I_##i]; s[K_I_##i] = ROL(t1, K_R_##i);                     \
+}                                                                       \
 while (0)
+
+/**
+ * Mix the XOR of the colums values into each number by column.
+ *
+ * @param [in] s  The state.
+ * @param [in] b  Temporary array of XORed column values.
+ * @param [in] x   The index of the column.
+ * @param [in] t  Temporary variable.
+ */
+#define COL_MIX(s, b, x, t)                                             \
+do                                                                      \
+{                                                                       \
+    for (x=0; x<5; x++)                                                 \
+        b[x] = s[x+0] ^ s[x+5] ^ s[x+10] ^ s[x+15] ^ s[x+20];           \
+    for (x=0; x<5; x++)                                                 \
+    {                                                                   \
+        t = b[(x+4)%5] ^ ROL(b[(x+1)%5], 1);                            \
+        s[x+0]^=t; s[x+5]^=t; s[x+10]^=t; s[x+15]^=t; s[x+20]^=t;       \
+    }                                                                   \
+}                                                                       \
+while (0)
+
+#ifdef SHA3_BY_SPEC
+/**
+ * Mix the row values.
+ * BMI1 has ANDN instruction ((~a) & b) - Haswell and above
+ *
+ * @param [in] s   The state.
+ * @param [in] b   Temporary array of XORed row values.
+ * @param [in] y   The index of the row to work on.
+ * @param [in] x   The index of the column.
+ * @param [in] t0  Temporary variable.
+ * @param [in] t1  Temporary variable.
+ */
+#define ROW_MIX(s, b, y, x, t0, t1)                                     \
+do                                                                      \
+{                                                                       \
+    for (y=0; y<5; y++)                                                 \
+    {                                                                   \
+        for (x=0; x<5; x++)                                             \
+            b[x]=s[y*5+x];                                              \
+        for (x=0; x<5; x++)                                             \
+           s[y*5+x] = b[x] ^ (~b[(x+1)%5] & b[(x+2)%5]);                \
+    }                                                                   \
+}                                                                       \
+while (0)
+#else
+/**
+ * Mix the row values.
+ * a ^ (~b & c) == a ^ (c & (b ^ c)) == (a ^ b) ^ (b | c)
+ *
+ * @param [in] s   The state.
+ * @param [in] b   Temporary array of XORed row values.
+ * @param [in] y   The index of the row to work on.
+ * @param [in] x   The index of the column.
+ * @param [in] t0  Temporary variable.
+ * @param [in] t1  Temporary variable.
+ */
+#define ROW_MIX(s, b, y, x, t12, t34)                                   \
+do                                                                      \
+{                                                                       \
+    for (y=0; y<5; y++)                                                 \
+    {                                                                   \
+        for (x=0; x<5; x++)                                             \
+            b[x]=s[y*5+x];                                              \
+        t12 = (b[1] ^ b[2]); t34 = (b[3] ^ b[4]);                       \
+        s[y*5+0] = b[0] ^ (b[2] &  t12);                                \
+        s[y*5+1] =  t12 ^ (b[2] | b[3]);                                \
+        s[y*5+2] = b[2] ^ (b[4] &  t34);                                \
+        s[y*5+3] =  t34 ^ (b[4] | b[0]);                                \
+        s[y*5+4] = b[4] ^ (b[1] & (b[0] ^ b[1]));                       \
+    }                                                                   \
+}                                                                       \
+while (0)
+#endif
 
 /**
  * The block operation performed on the state.
@@ -126,59 +213,43 @@ while (0)
  */
 static void ntru_keccak_block(uint64_t *s)
 {
-    uint8_t x, y, n;
-    uint64_t t, t2;
+    uint8_t i, x, y;
+    uint64_t t0, t1;
     uint64_t b[5];
 
-    for (n=0; n<24; n++)
+    for (i=0; i<24; i++)
     {
-        for (x=0; x<5; x++)
-        {
-            b[x] = 0;
-            for (y=0; y<5; y++)
-                b[x] ^= s[x+y*5];
-        }
-        for (x=0; x<5; x++)
-        {
-            t = b[(x+4) % 5] ^ ROL(b[(x+1) % 5], 1);
-            for (y=0; y<5; y++)
-                s[x+y*5] ^= t;
-        }
+        COL_MIX(s, b, x, t0);
 
-        t = s[1];
-        L(s, t, t2,  0);
-        L(s, t, t2,  1);
-        L(s, t, t2,  2);
-        L(s, t, t2,  3);
-        L(s, t, t2,  4);
-        L(s, t, t2,  5);
-        L(s, t, t2,  6);
-        L(s, t, t2,  7);
-        L(s, t, t2,  8);
-        L(s, t, t2,  9);
-        L(s, t, t2, 10);
-        L(s, t, t2, 11);
-        L(s, t, t2, 12);
-        L(s, t, t2, 13);
-        L(s, t, t2, 14);
-        L(s, t, t2, 15);
-        L(s, t, t2, 16);
-        L(s, t, t2, 17);
-        L(s, t, t2, 18);
-        L(s, t, t2, 19);
-        L(s, t, t2, 20);
-        L(s, t, t2, 21);
-        L(s, t, t2, 22);
-        L(s, t, t2, 23);
+        t0 = s[1];
+        SWAP(s, t0, t1,  0);
+        SWAP(s, t1, t0,  1);
+        SWAP(s, t0, t1,  2);
+        SWAP(s, t1, t0,  3);
+        SWAP(s, t0, t1,  4);
+        SWAP(s, t1, t0,  5);
+        SWAP(s, t0, t1,  6);
+        SWAP(s, t1, t0,  7);
+        SWAP(s, t0, t1,  8);
+        SWAP(s, t1, t0,  9);
+        SWAP(s, t0, t1, 10);
+        SWAP(s, t1, t0, 11);
+        SWAP(s, t0, t1, 12);
+        SWAP(s, t1, t0, 13);
+        SWAP(s, t0, t1, 14);
+        SWAP(s, t1, t0, 15);
+        SWAP(s, t0, t1, 16);
+        SWAP(s, t1, t0, 17);
+        SWAP(s, t0, t1, 18);
+        SWAP(s, t1, t0, 19);
+        SWAP(s, t0, t1, 20);
+        SWAP(s, t1, t0, 21);
+        SWAP(s, t0, t1, 22);
+        SWAP(s, t1, t0, 23);
 
-        for (y=0; y<5; y++)
-        {
-            for (x=0; x<5; x++)
-                b[x] = s[x+y*5];
-            for (x=0; x<5; x++)
-                s[x+y*5] = b[x] ^ (~b[(x+1) % 5] & b[(x+2) % 5]);
-        }
-        s[0] ^= ntru_keccak_r[n];
+        ROW_MIX(s, b, y, x, t0, t1);
+
+        s[0] ^= ntru_keccak_r[i];
     }
 }
 
